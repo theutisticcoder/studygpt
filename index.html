@@ -17,6 +17,8 @@
 </head>
 <style>
   #output{
+    text-wrap: pretty;
+    font-size: 35pt;
     height: 90vh;
     width: 100vw;
     background: navy;
@@ -24,6 +26,26 @@
     border-radius: 5px;
     position: absolute;
     overflow-y: scroll;
+  }
+  .you{
+    border-radius: 5px;
+    position: relative;
+    left: 50%;
+    width: 50%;
+
+    text-wrap: pretty;
+    font-size: 35pt;
+    color: black;
+    background: teal;
+  }
+  .gpt{
+    border-radius: 5px;
+    position: relative;
+    width: 50%;
+    text-wrap: pretty;
+    font-size: 35pt;
+    color: black;
+    background: lightgray;
   }
   #input{
     height: 10vh;
@@ -41,12 +63,12 @@
       const socket = io();
    document.querySelector("#input").onkeydown = (e)=> {
     if(e.key == "Enter"){
-    document.querySelector("#output").innerHTML += document.querySelector("#input").value + "\n"
+    document.querySelector("#output").innerHTML += "<div class='gpt'>"+document.querySelector("#input").value + "</div>" +"<br>"
     socket.emit("submit", document.querySelector("#input").value)
    }
   }
    socket.on("return", t=> {
-    document.querySelector("#output").innerHTML += t + "\n"
+    document.querySelector("#output").innerHTML += "<div class='gpt'>"+ t +"</div>" + "<br>"
 
    })
    </script>
