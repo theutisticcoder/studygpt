@@ -4,11 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study.GPT</title>
+    <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          }
+        }
+      </script>
 </head>
+<style>
+  #output{
+    height: 90vh;
+    width: 100vw;
+    backgroud: navy;
+    color: white;
+    border-radius: 5px;
+    position: absolute;
+  }
+  #input{
+    height: 10vh;
+    width: 100vw;
+    position: absolute;
+    top: 90vh;
+  }
+</style>
 <body>
-    <iframe
-    src="https://www.chatbase.co/chatbot-iframe/HB3smXVtDbjtez2FjRykX"
-    style="height: 100vh; min-height: 700px; width: 100vw; scale: 0.8;"
-    frameborder="0"
-    ></iframe></body>
+  <div id="output"></div>
+  <textarea id="input"></textarea>
+      <script type="module">
+      import { GoogleGenerativeAI } from "@google/generative-ai";
+
+      // Fetch your API_KEY
+      const API_KEY = "...";
+
+      // Access your API key (see "Set up your API key" above)
+      const genAI = new GoogleGenerativeAI(API_KEY);
+
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
+      async function run() {
+  const prompt = "Write a story about an AI and magic"
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+  console.log(text);
+}
+
+run();
+   </script>
 </html>
