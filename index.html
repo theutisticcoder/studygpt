@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study.GPT</title>
-    <script type="importmap">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study.GPT</title>
+  <script type="importmap">
         {
           "imports": {
             "@google/generative-ai": "https://esm.run/@google/generative-ai"
           }
         }
       </script>
-      <script type="module">
-      
-      </script>
+  <script type="module">
+
+  </script>
 </head>
 <style>
-  #output{
+  #output {
     text-wrap: pretty;
     font-size: 35pt;
     height: 90vh;
     width: 100vw;
-    background: navy;
+    background: darkred;
     color: white;
     border-radius: 5px;
     position: absolute;
     overflow-y: scroll;
   }
-  .you{
+
+  .you {
     border-radius: 5px;
     position: absolute;
     left: 50%;
@@ -37,39 +39,84 @@
     color: black;
     background: teal;
   }
-  .gpt{
+
+  .gpt {
     border-radius: 5px;
     position: static;
     width: 50%;
     text-wrap: pretty;
     font-size: 20pt;
-    color: black;
+    color: white;
     background: lightgray;
   }
-  #input{
+
+  #input {
     height: 10vh;
     width: 100vw;
     position: absolute;
     top: 90vh;
   }
-</style>
-<body>
-  <div id="output"></div>
-  <textarea id="input" placeholder="Chat here..."></textarea>
-      <script type="module">
-          import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
-      const socket = io();
-   document.querySelector("#input").onkeydown = (e)=> {
-    if(e.key == "Enter"){
-    document.querySelector("#output").innerHTML += "<div class='you'>"+document.querySelector("#input").value + "</div>" +"<br>"
-    socket.emit("submit", document.querySelector("#input").value)
-   }
+  #tabs{
+    width: 100vw;
+    overflow-x: scroll;
+    position: absolute;
+    background: darkred;
   }
-   socket.on("return", t=> {
-    document.querySelector("#input").value = "";
+button{
+  position: static;
+  background: darkred;
+  border: 1px solid white;
+  color: white;
 
-    document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>"+ t +"</div>" + "<br>"
-    document.querySelector("#output").scrollIntoView();
-   })
-   </script>
+}
+</style>
+
+<body>
+  <div id="tabs"></div>
+  <div id="output"></div>
+  <h1 hidden id="load">Loading...</h1>
+  <textarea id="input" placeholder="Chat here..."></textarea>
+  <script type="module">
+    var message = 0;
+    var lsname = "";
+    var messages = [];
+    var outputs = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const value = localStorage.getItem("c" + i);
+      outputs.push(value);
+     var out = document.createElement("button");
+    out.id = i;
+     out.onclick = (e)=> {
+      document.querySelector("output").innerHTML = values[parseInt(e.target.id)];
+     }
+       document.querySelector("#tabs").appendChild(out);  
+    }
+    import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
+    const socket = io();
+    document.querySelector("#input").onkeydown = (e) => {
+      if (e.key == "Enter") {
+        message++;
+
+        document.querySelector("#output").innerHTML += "<div class='you'>" + document.querySelector("#input").value + "</div>" + "<br>"
+        socket.emit("submit", document.querySelector("#input").value);
+        document.querySelector("#load").hidden = false;
+      }
+    }
+    socket.on("return", t => {
+     
+      document.querySelector("#input").value = "";
+      document.querySelector("#load").hidden = true;
+      document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
+      if(output.querySelectorAll("#gpt").length === 1){
+      localStorage.setItem("c" + localStorage.length, document.querySelector("#output").innerHTML);
+        lsname = "c" + localStorage.length;
+      }
+      else{
+        localStorage.setItem(lsname, document.querySelector("#output").innerHTML);
+      }
+      
+    })
+       
+  </script>
+
 </html>
