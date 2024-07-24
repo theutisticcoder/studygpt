@@ -20,9 +20,10 @@
   #output {
     text-wrap: pretty;
     font-size: 35pt;
-    height: 90vh;
+    top: 10vh;
+    height: 80vh;
     width: 100vw;
-    background: darkred;
+    background: black;
     color: white;
     border-radius: 5px;
     position: absolute;
@@ -36,8 +37,8 @@
     width: 50%;
     text-wrap: pretty;
     font-size: 20pt;
-    color: black;
-    background: teal;
+    color: white;
+    background: blue;
   }
 
   .gpt {
@@ -47,7 +48,7 @@
     text-wrap: pretty;
     font-size: 20pt;
     color: white;
-    background: lightgray;
+    background: darkslategray;
   }
 
   #input {
@@ -57,14 +58,15 @@
     top: 90vh;
   }
   #tabs{
+    height: 10vh;
     width: 100vw;
     overflow-x: scroll;
     position: absolute;
-    background: darkred;
+    background: black;
   }
 button{
   position: static;
-  background: darkred;
+  background: black;
   border: 1px solid white;
   color: white;
 
@@ -107,7 +109,7 @@ button{
       document.querySelector("#input").value = "";
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
-      if(output.querySelectorAll("#gpt").length === 1){
+      if(output.querySelectorAll(".gpt").length === 1){
       localStorage.setItem("c" + localStorage.length, document.querySelector("#output").innerHTML);
         lsname = "c" + localStorage.length;
       }
