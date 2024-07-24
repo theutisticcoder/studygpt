@@ -12,9 +12,7 @@
         }
       </script>
       <script type="module">
-        import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
       
-        const socket = io();
       </script>
 </head>
 <style>
@@ -38,6 +36,9 @@
   <div id="output"></div>
   <textarea id="input" placeholder="Chat here..."></textarea>
       <script type="module">
+          import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
+      
+      const socket = io();
    document.querySelector("#input").onkeydown = (e)=> {
     if(e.key == "Enter"){
     document.querySelector("#output").innerHTML += document.querySelector("#input").value + "\n"
