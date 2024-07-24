@@ -9,7 +9,7 @@
 const express = require("express");
 var app = express();
 const server = require("http").server;
-const sio = require("socket.io")(server);
+const io = require("socket.io")(server);
 app.use(express.static(__dirname));
 const {
     GoogleGenerativeAI,
@@ -57,7 +57,6 @@ const {
   
   
 
-  const io = sio();
   io.on("connection", socket=> {
     socket.on("submit", async text=> {
       const result = await chatSession.sendMessage(text);
