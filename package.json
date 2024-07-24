@@ -12,5 +12,9 @@
     "@google/generative-ai": "^0.15.0",
     "express": "^4.19.2",
     "socket.io": "^4.7.5"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "npm i"
   }
 }
