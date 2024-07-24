@@ -59,7 +59,7 @@ const {
 
   const io = sio();
   io.on("connection", socket=> {
-    socket.on("submit", text=> {
+    socket.on("submit", async text=> {
       const result = await chatSession.sendMessage(text);
       socket.emit("return", result.response.text());
     })
