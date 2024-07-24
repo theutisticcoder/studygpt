@@ -6,7 +6,7 @@
  * See the getting started guide for more information
  * https://ai.google.dev/gemini-api/docs/get-started/node
  */
-const express = require(express);
+const express = require("express");
 var app = express();
 const server = require("http").server;
 const sio = require("socket.io")(server);
