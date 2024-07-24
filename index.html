@@ -34,7 +34,7 @@
     width: 50%;
 
     text-wrap: pretty;
-    font-size: 35pt;
+    font-size: 20pt;
     color: black;
     background: teal;
   }
@@ -43,7 +43,7 @@
     position: relative;
     width: 50%;
     text-wrap: pretty;
-    font-size: 35pt;
+    font-size: 20pt;
     color: black;
     background: lightgray;
   }
@@ -63,7 +63,7 @@
       const socket = io();
    document.querySelector("#input").onkeydown = (e)=> {
     if(e.key == "Enter"){
-    document.querySelector("#output").innerHTML += "<div class='gpt'>"+document.querySelector("#input").value + "</div>" +"<br>"
+    document.querySelector("#output").innerHTML += "<div class='you'>"+document.querySelector("#input").value + "</div>" +"<br>"
     socket.emit("submit", document.querySelector("#input").value)
    }
   }
