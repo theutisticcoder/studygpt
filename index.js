@@ -8,7 +8,7 @@
  */
 const express = require("express");
 var app = express();
-const server = require("http").server;
+const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 app.use(express.static(__dirname));
 const {
