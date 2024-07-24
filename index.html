@@ -45,7 +45,7 @@
     socket.emit("submit", document.querySelector("#input").value)
    }
   }
-   socket.on("result", t=> {
+   socket.on("return", t=> {
     document.querySelector("#output").innerHTML += t + "\n"
 
    })
