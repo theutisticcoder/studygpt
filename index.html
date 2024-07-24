@@ -89,7 +89,7 @@ button{
      var out = document.createElement("button");
     out.id = i;
      out.onclick = (e)=> {
-      document.querySelector("output").innerHTML = values[parseInt(e.target.id)];
+      document.querySelector("output").innerHTML = outputs[parseInt(e.target.id)];
      }
        document.querySelector("#tabs").appendChild(out);  
     }
@@ -109,7 +109,7 @@ button{
       document.querySelector("#input").value = "";
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
-      if(output.querySelectorAll(".gpt").length === 1){
+      if(message === 1){
       localStorage.setItem("c" + localStorage.length, document.querySelector("#output").innerHTML);
         lsname = "c" + localStorage.length;
       }
