@@ -65,6 +65,7 @@
     if(e.key == "Enter"){
     document.querySelector("#output").innerHTML += "<div class='you'>"+document.querySelector("#input").value + "</div>" +"<br>"
     socket.emit("submit", document.querySelector("#input").value)
+    document.querySelector("#input").value = "";
    }
   }
    socket.on("return", t=> {
