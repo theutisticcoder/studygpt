@@ -11,15 +11,21 @@
           }
         }
       </script>
+      <script type="module">
+        import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
+      
+        const socket = io();
+      </script>
 </head>
 <style>
   #output{
     height: 90vh;
     width: 100vw;
-    backgroud: navy;
+    background: navy;
     color: white;
     border-radius: 5px;
     position: absolute;
+    overflow-y: scroll;
   }
   #input{
     height: 10vh;
@@ -30,27 +36,15 @@
 </style>
 <body>
   <div id="output"></div>
-  <textarea id="input"></textarea>
+  <textarea id="input" placeholder="Chat here..."></textarea>
       <script type="module">
-      import { GoogleGenerativeAI } from "@google/generative-ai";
+   document.querySelector("#input").onkeydown = ()=> {
+    document.querySelector("#output").innerHTML += document.querySelector("#input").value + "\n"
+    socket.emit("submit", document.querySelector("#input").value)
+   }
+   socket.on("result", t=> {
+    document.querySelector("#output").innerHTML += t + "\n"
 
-      // Fetch your API_KEY
-      const API_KEY = "...";
-
-      // Access your API key (see "Set up your API key" above)
-      const genAI = new GoogleGenerativeAI(API_KEY);
-
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
-
-      async function run() {
-  const prompt = "Write a story about an AI and magic"
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
-  console.log(text);
-}
-
-run();
+   })
    </script>
 </html>
