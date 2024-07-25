@@ -68,6 +68,7 @@ button{
   position: static;
   background: black;
   border: 1px solid white;
+  font-size: 20pt;
   color: white;
 
 }
@@ -84,7 +85,7 @@ button{
     var messages = [];
     var outputs = []
     for (let i = 0; i < localStorage.length; i++) {
-      const value = localStorage.getItem("c" + i);
+      const value = localStorage.getItem(localStorage.keys[i]);
       outputs.push(value);
      var out = document.createElement("button");
     out.id = i;
