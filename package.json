@@ -2,19 +2,18 @@
   "name": "study.gpt",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "build": "npm i"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.15.0",
     "express": "^4.19.2",
-    "socket.io": "^4.7.5"
-  },
-  "scripts": {
-    "start": "node index.js",
-    "build": "npm i"
+    "socket.io": "^4.7.5",
+    "vercel": "^35.2.1"
   }
 }
