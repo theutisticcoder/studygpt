@@ -89,8 +89,9 @@ button{
       outputs.push(value);
      var out = document.createElement("button");
     out.id = i;
+    out.innerHTML = value;
      out.onclick = (e)=> {
-      document.querySelector("output").innerHTML = outputs[parseInt(e.target.id)];
+      document.querySelector("#output").innerHTML = outputs[parseInt(e.target.id)];
      }
        document.querySelector("#tabs").appendChild(out);  
     }
