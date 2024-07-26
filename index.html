@@ -85,7 +85,7 @@ button{
     var messages = [];
     var outputs = []
     for (let i = 0; i < localStorage.length; i++) {
-      const value = localStorage.getItem("c" + i);
+      const value = JSON.parse(localStorage.getItem("c" + i));
       outputs.push(value.out);
      var out = document.createElement("button");
     out.id = i;
@@ -112,7 +112,7 @@ button{
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
-      localStorage.setItem("c" + localStorage.length, {out: document.querySelector("#output").innerHTML, in: start});
+      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start}));
         lsname = "c" + localStorage.length;
       }
       else{
