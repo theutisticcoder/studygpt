@@ -85,7 +85,7 @@ button{
     var messages = [];
     var outputs = []
     for (let i = 0; i < localStorage.length; i++) {
-      const value = localStorage.getItem(localStorage.key(i));
+      const value = localStorage.getItem("c" + i);
       outputs.push(value.out);
      var out = document.createElement("button");
     out.id = i;
