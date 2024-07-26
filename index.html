@@ -92,6 +92,7 @@ button{
     out.id = i;
     out.innerHTML = value.in;
      out.onclick = (e)=> {
+      lsname = value.lsname;
       message = value.messages;
       document.querySelector("#output").innerHTML = value.out;
      }
@@ -115,11 +116,11 @@ button{
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
-      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message}));
         lsname = "c" + localStorage.length;
+      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
       }
       else{
-        localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message}));
+        localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
       }
       document.querySelector("#output").scrollTop =  document.querySelector("#output").scrollHeight;
    
