@@ -92,6 +92,7 @@ button{
     out.id = i;
     out.innerHTML = value.in;
      out.onclick = (e)=> {
+      message = value.messages;
       document.querySelector("#output").innerHTML = value.out;
      }
        document.querySelector("#tabs").appendChild(out);  
@@ -113,11 +114,11 @@ button{
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
-      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start}));
+      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message}));
         lsname = "c" + localStorage.length;
       }
       else{
-        localStorage.setItem(lsname, document.querySelector("#output").innerHTML);
+        localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message}));
       }
       
     })
