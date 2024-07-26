@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Study.GPT</title>
+  <link rel="manifest" href="pwa.webmanifest">
   <script type="importmap">
         {
           "imports": {
@@ -120,7 +121,17 @@ button{
       }
       
     })
-       
+    document.addEventListener('DOMContentLoaded', init, false);
+function init() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((reg) => {
+        console.log('Service worker registered -->', reg);
+      }, (err) => {
+        console.error('Service worker not registered -->', err);
+      });
+  }
+}
   </script>
 
 </html>

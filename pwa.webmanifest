@@ -1,0 +1,16 @@
+{
+    "name": "StudyGPT",
+    "short_name": "StudyGPT",
+    "description": "Chat with an AI to help you study!",
+    "icons": [
+      {
+        "src": "/icon.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/",
+    "display": "fullscreen",
+    "theme_color": "#764ABC",
+    "background_color": "#764ABC"
+  }
