@@ -86,12 +86,12 @@ button{
     var outputs = []
     for (let i = 0; i < localStorage.length; i++) {
       const value = localStorage.getItem(localStorage.key(i));
-      outputs.push(value);
+      outputs.push(value.out);
      var out = document.createElement("button");
     out.id = i;
-    out.innerHTML = value;
+    out.innerHTML = value.in;
      out.onclick = (e)=> {
-      document.querySelector("#output").innerHTML = outputs[parseInt(e.target.id)];
+      document.querySelector("#output").innerHTML = value.out;
      }
        document.querySelector("#tabs").appendChild(out);  
     }
@@ -107,12 +107,12 @@ button{
       }
     }
     socket.on("return", t => {
-     
+     var start = document.querySelector("#input").value;
       document.querySelector("#input").value = "";
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
-      localStorage.setItem("c" + localStorage.length, document.querySelector("#output").innerHTML);
+      localStorage.setItem("c" + localStorage.length, {out: document.querySelector("#output").innerHTML, in: start});
         lsname = "c" + localStorage.length;
       }
       else{
