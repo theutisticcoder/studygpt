@@ -99,7 +99,7 @@ button{
       lsname = value.lsname;
       message = value.messages;
       document.querySelector("#output").innerHTML = value.out;
-      socket.emit("chat", value.hist);
+      socket.emit("chat", value.history);
       hist = value.history;
      }
        document.querySelector("#tabs").appendChild(out);  
