@@ -37,7 +37,10 @@ const {
       generationConfig,
    // safetySettings: Adjust safety settings
    // See https://ai.google.dev/gemini-api/docs/safety-settings
-    history: []
+    history: [{
+      role: "user",
+      parts: ""
+    }]
     });
   
   
