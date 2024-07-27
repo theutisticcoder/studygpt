@@ -83,6 +83,7 @@ button{
   
   <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
   <script>
+    var start;
         const socket = io();
         var hist = [];
     var message = 0;
@@ -117,7 +118,7 @@ origin =   document.querySelector("#input").value;
       }
     }
     socket.on("return", t => {
-     var start = document.querySelector("#input").value;
+      start = document.querySelector("#input").value;
       document.querySelector("#input").value = "";
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
