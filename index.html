@@ -81,6 +81,7 @@ button{
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
   <script type="module">
+    var history = [];
     var message = 0;
     var lsname = "";
     var messages = [];
@@ -95,6 +96,7 @@ button{
       lsname = value.lsname;
       message = value.messages;
       document.querySelector("#output").innerHTML = value.out;
+      socket.emit("chat", value.history);
      }
        document.querySelector("#tabs").appendChild(out);  
     }
@@ -119,7 +121,9 @@ origin =   document.querySelector("#input").value;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
         lsname = "c" + localStorage.length;
-      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
+        history.push({role: "user", parts: start});
+        history.push({role: "model", parts: t});
+      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname, history: history}));
       }
       else{
         localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));

@@ -22,7 +22,7 @@ const {
   
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
-    systemInstruction: "This is a study bot, made to help people learn and thrive in school, work, and at home studying.\nFor example, this study bot can make summaries of text, explain history, help with homework, and even create a study plan.",
+    systemInstruction: "This is a study bot, made to help people learn and thrive in school, work, and at home studying.\nFor example, this study bot can make summaries of text, explain history, help with homework, and even create a study plan.\nIt starts by telling an on topic joke to keep things enjoyable, revises notes and essays, and can give quizzes one question at a time, and allows the person to answer, then gives feedback and moves on.",
   });
   
   const generationConfig = {
@@ -33,26 +33,11 @@ const {
     responseMimeType: "text/plain",
   };
   
-    const chatSession = model.startChat({
+    var chatSession = model.startChat({
       generationConfig,
    // safetySettings: Adjust safety settings
    // See https://ai.google.dev/gemini-api/docs/safety-settings
-      history: [
-        {
-          role: "user",
-          parts: [
-            {text: "This is a study bot, made to help people learn and thrive in school, work, and at home studying.\nFor example, this study bot can make summaries of text, explain history, help with homework, and even create a study plan."},
-            {text: "what can you do?"},
-            {text: "can you summarize what this ai is made for?"},
-          ],
-        },
-        {
-          role: "model",
-          parts: [
-            {text: "This AI is designed to be a helpful study companion! It can assist you in various ways, including:\n\n* **Summarizing text:**  Making complex information easier to understand.\n* **Explaining historical events:** Providing insightful and accurate information.\n* **Helping with homework:** Offering guidance and solutions to problems.\n* **Creating study plans:** Tailoring a schedule to your specific needs and goals.\n\nEssentially, this AI aims to make learning more efficient and enjoyable for students, professionals, and anyone interested in improving their knowledge and skills. \n"},
-          ],
-        },
-      ],
+    history: []
     });
   
   
@@ -61,6 +46,14 @@ const {
     socket.on("submit", async text=> {
       const result = await chatSession.sendMessage(text);
       socket.emit("return", result.response.text());
+    })
+    socket.on("chat", hist => {
+       chatSession = model.startChat({
+        generationConfig,
+     // safetySettings: Adjust safety settings
+     // See https://ai.google.dev/gemini-api/docs/safety-settings
+        history: hist
+      });
     })
   })
   server.listen(3000);
