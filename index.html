@@ -122,8 +122,8 @@ origin =   document.querySelector("#input").value;
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       
-      history.push({role: "user", parts: start});
-        history.push({role: "model", parts: t});
+      history.push({role: "user", parts: [{text: start}]});
+        history.push({role: "model", parts: [{text: t}]});
         console.log(history)
       if(message === 1){
         lsname = "c" + localStorage.length;

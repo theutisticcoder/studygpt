@@ -39,7 +39,7 @@ const {
    // See https://ai.google.dev/gemini-api/docs/safety-settings
     history: [{
       role: "user",
-      parts: ["how can you help me?"],
+      parts: [{text: "how can you help me?"}],
     }]
     },);
   
