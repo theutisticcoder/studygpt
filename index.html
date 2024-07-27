@@ -119,14 +119,15 @@ origin =   document.querySelector("#input").value;
       document.querySelector("#input").value = "";
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
+      
+      history.push({role: "user", parts: start});
+        history.push({role: "model", parts: t});
       if(message === 1){
         lsname = "c" + localStorage.length;
-        history.push({role: "user", parts: start});
-        history.push({role: "model", parts: t});
       localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname, history: history}));
       }
       else{
-        localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
+        localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname, history: history}));
       }   
     })
     document.addEventListener('DOMContentLoaded', init, false);
