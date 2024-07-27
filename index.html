@@ -77,20 +77,24 @@ button{
 
 <body>
   <div id="tabs"></div>
-  <div id="output"></div>
+  <div id="output">
+    <div class="gpt">Type something below, then use control (or command) enter.</div>
+  </div>
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Chat here..."></textarea>
   <script type="module">
+
     var message = 0;
     var lsname = "";
     var messages = [];
-    var outputs = []
+    var outputs = [];
     for (let i = 0; i < localStorage.length; i++) {
-      const value = JSON.parse(localStorage.getItem("c" + i));
-      outputs.push(value.out);
+      outputs.push(localStorage.getItem(localStorage.key(i)));
+      var origin;
+     
      var out = document.createElement("button");
     out.id = i;
-    out.innerHTML = value.in;
+    out.innerHTML = localStorage.key(i);
      out.onclick = (e)=> {
       lsname = value.lsname;
       message = value.messages;
@@ -101,9 +105,11 @@ button{
     import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
     const socket = io();
     document.querySelector("#input").onkeydown = (e) => {
-      if (e.key == "Enter") {
+      if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
         message++;
-
+if(message === 1){
+origin =   document.querySelector("#input").value;
+}
         document.querySelector("#output").innerHTML += "<div class='you'>" + document.querySelector("#input").value + "</div>" + "<br>"
         socket.emit("submit", document.querySelector("#input").value);
         document.querySelector("#load").hidden = false;
@@ -116,14 +122,12 @@ button{
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
-        lsname = "c" + localStorage.length;
-      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
+      localStorage.setItem(origin, document.querySelector("#output").innerHTML);
+        lsname = origin;
       }
       else{
         localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
-      }
-      document.querySelector("#output").scrollTop =  document.querySelector("#output").scrollHeight;
-   
+      }   
     })
     document.addEventListener('DOMContentLoaded', init, false);
 function init() {
