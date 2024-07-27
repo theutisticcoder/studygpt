@@ -80,8 +80,11 @@ button{
   <div id="output"></div>
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
-  <script type="module">
-    var history = [];
+  
+  <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
+  <script>
+        const socket = io();
+        var history = [];
     var message = 0;
     var lsname = "";
     var messages = [];
@@ -101,8 +104,6 @@ button{
      }
        document.querySelector("#tabs").appendChild(out);  
     }
-    import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
-    const socket = io();
     document.querySelector("#input").onkeydown = (e) => {
       if (e.key == "Enter" && (e.ctrlKey || e.metaKey)) {
         message++;
