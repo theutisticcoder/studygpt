@@ -77,24 +77,20 @@ button{
 
 <body>
   <div id="tabs"></div>
-  <div id="output">
-    <div class="gpt">Type something below, then use control (or command) enter.</div>
-  </div>
+  <div id="output"></div>
   <h1 hidden id="load">Loading...</h1>
-  <textarea id="input" placeholder="Chat here..."></textarea>
+  <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
   <script type="module">
-
     var message = 0;
     var lsname = "";
     var messages = [];
     var outputs = [];
     for (let i = 0; i < localStorage.length; i++) {
-      outputs.push(localStorage.getItem(localStorage.key(i)));
-      var origin;
-     
+      const value = JSON.parse(localStorage.getItem("c" + i));
+      outputs.push(value.out);
      var out = document.createElement("button");
     out.id = i;
-    out.innerHTML = localStorage.key(i);
+    out.innerHTML = value.in;
      out.onclick = (e)=> {
       lsname = value.lsname;
       message = value.messages;
@@ -105,7 +101,7 @@ button{
     import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
     const socket = io();
     document.querySelector("#input").onkeydown = (e) => {
-      if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
+      if (e.key == "Enter" && (e.ctrlKey || e.metaKey)) {
         message++;
 if(message === 1){
 origin =   document.querySelector("#input").value;
@@ -122,8 +118,8 @@ origin =   document.querySelector("#input").value;
       document.querySelector("#load").hidden = true;
       document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
       if(message === 1){
-      localStorage.setItem(origin, document.querySelector("#output").innerHTML);
-        lsname = origin;
+        lsname = "c" + localStorage.length;
+      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
       }
       else{
         localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname}));
