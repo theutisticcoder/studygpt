@@ -9,7 +9,7 @@
 <body>
     <script>
         const socket = io();
-        const recognition = new SpeechRecognition() || new webkitSpeechRecognition();
+        const recognition =  window.SpeechRecognition || window.webkitSpeechRecognition;
   
   recognition.lang = "en-US";
   recognition.interimResults = false;
