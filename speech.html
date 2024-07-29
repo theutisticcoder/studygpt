@@ -9,10 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/easy-speech/dist/EasySpeech.iife.js"></script>
 </head>
 <body>
+  <div id="output"></div>
+  <button id="show">Toggle Conversation</button>
     <button id="chat">Start Voice Chat</button>
     <script>
+      var output = "";
         const socket = io();
-
+document.getElementById("show").onclick = ()=> {
+  if(document.querySelector("#output").innerHTML.length === 0) document.querySelector("#output").innerHTML = output;
+  else if(document.querySelector("#output").innerHTML.length > 0) document.querySelector("#output").innerHTML = "";
+}
         var recognition =  new webkitSpeechRecognition();
   
   recognition.lang = "en-US";
@@ -27,6 +33,7 @@
 recognition.onresult = (event) => {
   var chat = event.results[event.results.length -1][0].transcript;
   console.log(chat);
+  output += "<strong>You said: </strong>"+chat + "<br><br>";
   socket.emit("audio", chat);
 };
 };
@@ -37,6 +44,8 @@ socket.on("talk", async speech=> {
   rate: 1,
   volume: 2
 }) ; 
+output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
+
   recognition.start();
 })
     </script>
