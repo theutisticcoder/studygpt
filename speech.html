@@ -37,13 +37,8 @@ recognition.onresult = (event) => {
   socket.emit("audio", chat);
 };
 };
-socket.on("talk", async speech=> {
-    await EasySpeech.speak({
-  text: speech, // optional, will use a default or fallback
-  pitch: 1,
-  rate: 1,
-  volume: 2
-}) ; 
+socket.on("talk",  speech=> {
+    SpeechSynthesis.speak(new SpeechSynthesisUtterance(speech))
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
 
   recognition.start();
