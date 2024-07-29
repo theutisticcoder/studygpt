@@ -28,6 +28,7 @@ document.getElementById("show").onclick = ()=> {
   document.getElementById("chat").innerHTML = "Talk Back";
   recognition.addEventListener("audioend", () => {
     recognition.stop();
+    recognition.abort();
 });
 recognition.onresult = (event) => {
   var chat = event.results[event.results.length -1][0].transcript;
