@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
+    <title>Talk To StudyGPT</title>
+</head>
+<body>
+    <script>
+        const socket = io();
+        const recognition = new SpeechRecognition();
+  
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  document.body.onclick = () => {
+  recognition.start();
+  recognition.addEventListener("speechend", (e) => {
+    recognition.stop();
+});
+recognition.onresult = (event) => {
+  var chat = event.results[0][0].transcript;
+  socket.emit("audio", chat);
+};
+};
+socket.on("talk", speech=> {
+    speechSynthesis.speak(new SpeechSynthesisUtterance(talk));
+})
+    </script>
+    
+</body>
+</html>

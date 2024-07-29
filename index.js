@@ -50,6 +50,10 @@ const {
       const result = await chatSession.sendMessage(text);
       socket.emit("return", result.response.text());
     })
+    socket.on("audio", async c=> {
+      const result = await chatSession.sendMessage(text);
+      socket.emit("talk", result.response.text());
+    })
     socket.on("chat", hist => {
        chatSession = model.startChat({
         generationConfig,
