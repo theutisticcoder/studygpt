@@ -31,6 +31,7 @@ recognition.onresult = (event) => {
 };
 socket.on("talk", speech=> {
     speechSynthesis.speak(new SpeechSynthesisUtterance(speech));
+    recognition.start();
 })
     </script>
     
