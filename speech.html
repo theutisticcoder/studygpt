@@ -6,6 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
     <script src="artyom.js"></script>
     <title>Talk To StudyGPT</title>
+    <script src="https://cdn.jsdelivr.net/npm/easy-speech/dist/EasySpeech.iife.js"></script>
 </head>
 <body>
     <button id="chat">Start Voice Chat</button>
@@ -29,9 +30,14 @@ recognition.onresult = (event) => {
   socket.emit("audio", chat);
 };
 };
-socket.on("talk", speech=> {
-    speechSynthesis.speak(new SpeechSynthesisUtterance(speech));
-    recognition.start();
+socket.on("talk", async speech=> {
+    await EasySpeech.speak({
+  text: speech, // optional, will use a default or fallback
+  pitch: 1,
+  rate: 1,
+  volume: 2
+}) ; 
+  recognition.start();
 })
     </script>
     
