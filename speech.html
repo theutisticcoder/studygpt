@@ -36,7 +36,7 @@ recognition.onresult = (event) => {
 };
 };
 socket.on("talk",  speech=> {
-    window.SpeechSynthesis.speak(new SpeechSynthesisUtterance(speech))
+   speechSynthesis.speak(new SpeechSynthesisUtterance(speech))
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
 
   recognition.start();
