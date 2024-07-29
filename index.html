@@ -111,7 +111,7 @@ button{
        document.querySelector("#tabs").appendChild(out);  
     }
     document.querySelector("#input").onkeydown = (e) => {
-      if ((e.key == "Enter" && mobileAndTabletCheck()) && (e.key == "Enter" && (e.ctrlKey || e.metaKey))) {
+      if ((e.key == "Enter" && mobileAndTabletCheck()) || (e.key == "Enter" && (e.ctrlKey || e.metaKey))) {
         message++;
 if(message === 1){
 origin =   document.querySelector("#input").value;
