@@ -7,6 +7,7 @@
     <title>Talk To StudyGPT</title>
 </head>
 <body>
+    <button id="chat">Start Voice Chat</button>
     <script>
         const socket = io();
         var recognition =  new webkitSpeechRecognition();
@@ -15,7 +16,7 @@
   recognition.continuous = true;
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-  document.body.onclick = () => {
+  document.getElementById("chat").onclick = () => {
   recognition.start();
   recognition.addEventListener("audioend", () => {
     recognition.stop();
