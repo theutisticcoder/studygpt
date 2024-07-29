@@ -20,7 +20,7 @@ document.getElementById("show").onclick = ()=> {
         var recognition =  new webkitSpeechRecognition();
   
   recognition.lang = "en-US";
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
   document.getElementById("chat").onclick = () => {
@@ -28,13 +28,14 @@ document.getElementById("show").onclick = ()=> {
   document.getElementById("chat").innerHTML = "Talk Back";
   recognition.addEventListener("speechend", () => {
     recognition.stop();
-});
-recognition.onresult = (event) => {
+    recognition.onresult = (event) => {
   var chat = event.results[event.results.length -1][0].transcript;
   console.log(chat);
   output += "<strong>You said: </strong>"+chat + "<br><br>";
   socket.emit("audio", chat);
 };
+});
+
 };
 socket.on("talk",  speech=> {
    speechSynthesis.speak(new SpeechSynthesisUtterance(speech))
