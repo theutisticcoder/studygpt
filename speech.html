@@ -17,11 +17,12 @@
   recognition.maxAlternatives = 1;
   document.body.onclick = () => {
   recognition.start();
-  recognition.addEventListener("speechend", () => {
+  recognition.addEventListener("audioend", () => {
     recognition.stop();
 });
 recognition.onresult = (event) => {
   var chat = event.results[0][0].transcript;
+  alert(chat);
   console.log(chat);
   socket.emit("audio", chat);
 };
