@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
-    <script src="artyom.js"></script>
     <title>Talk To StudyGPT</title>
-    <script src="https://cdn.jsdelivr.net/npm/easy-speech/dist/EasySpeech.iife.js"></script>
 </head>
 <body>
   <div id="output"></div>
@@ -38,7 +36,7 @@ recognition.onresult = (event) => {
 };
 };
 socket.on("talk",  speech=> {
-    SpeechSynthesis.speak(new SpeechSynthesisUtterance(speech))
+    window.SpeechSynthesis.speak(new SpeechSynthesisUtterance(speech))
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
 
   recognition.start();
