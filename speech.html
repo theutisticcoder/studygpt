@@ -11,7 +11,7 @@
   <button id="show">Toggle Conversation</button>
     <button id="chat">Start Voice Chat</button>
     <script>
-      var output = "";
+      var output = "<strong>Your Conversation:</strong> <br><br>";
         const socket = io();
 document.getElementById("show").onclick = ()=> {
   if(document.querySelector("#output").innerHTML.length === 0) document.querySelector("#output").innerHTML = output;
@@ -39,6 +39,7 @@ recognition.onresult = (event) => {
 socket.on("talk",  speech=> {
    speechSynthesis.speak(new SpeechSynthesisUtterance(speech))
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
+recognition.start();
 })
     </script>
     
