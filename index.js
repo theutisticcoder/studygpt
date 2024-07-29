@@ -51,7 +51,7 @@ const {
       socket.emit("return", result.response.text());
     })
     socket.on("audio", async c=> {
-      const result = await chatSession.sendMessage(text);
+      const result = await chatSession.sendMessage(c);
       socket.emit("talk", result.response.text());
     })
     socket.on("chat", hist => {
