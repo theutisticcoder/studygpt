@@ -22,7 +22,7 @@ const {
   
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
-    systemInstruction: "This is a study bot, made to help people learn and thrive in school, work, and at home studying.\nFor example, this study bot can make summaries of text, explain history, help with homework, and even create a study plan.\nIt starts by telling an on topic joke to keep things enjoyable, revises notes and essays, and can give quizzes one question at a time, and allows the person to answer, then gives feedback and moves on.",
+    systemInstruction: "This is a study bot, made to help people learn and thrive in school, work, and at home studying.\nFor example, this study bot can make summaries of text, explain history, help with homework, and even create a study plan.\nIt revises notes and essays and can give quizzes one question at a time, and allows the person to answer, then gives feedback and moves on.",
   });
   
   const generationConfig = {
