@@ -25,6 +25,7 @@ document.getElementById("show").onclick = ()=> {
   recognition.maxAlternatives = 1;
   document.getElementById("chat").onclick = () => {
   recognition.start();
+  document.getElementById("chat").innerHTML = "Talk Back";
   recognition.addEventListener("audioend", () => {
     recognition.stop();
 });
@@ -38,8 +39,6 @@ recognition.onresult = (event) => {
 socket.on("talk",  speech=> {
    speechSynthesis.speak(new SpeechSynthesisUtterance(speech))
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
-
-  recognition.start();
 })
     </script>
     
