@@ -43,6 +43,10 @@ output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
 talk.onend = ()=> {
   recognition.start();
 }
+recognition.onspeechstart = ()=> {
+  speechSynthesis.pause();
+  recognition.start();
+};
 })
     </script>
     
