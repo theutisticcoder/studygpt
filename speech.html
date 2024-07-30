@@ -37,12 +37,12 @@ recognition.onresult = (event) => {
 };
 };
 socket.on("talk", speech=> {
-
-   window.speechSynthesis.speak(new SpeechSynthesisUtterance(speech))
+var talk = new SpeechSynthesisUtterance(speech);
+   window.speechSynthesis.speak(talk)
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
-setTimeout(()=> {
+talk.onend = ()=> {
   recognition.start();
-}, 10000)
+}
 
 })
     </script>
