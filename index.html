@@ -54,7 +54,7 @@
 
   #input {
     height: 10vh;
-    width: 100vw;
+    width: 80vw;
     position: absolute;
     top: 90vh;
   }
@@ -73,6 +73,12 @@ button{
   color: white;
 
 }
+#convo{
+  top: 90vh;
+  width: 20vw;
+  height: 10vh;
+  left: 80vw;
+}
 </style>
 
 <body>
@@ -80,7 +86,7 @@ button{
   <div id="output"></div>
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
-  <button onclick="voice()">Convert To Conversation</button>
+  <button id="convo" onclick="voice()">Convert To Conversation</button>
   <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
   <script>
     
