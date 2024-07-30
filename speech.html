@@ -40,7 +40,7 @@ socket.on("talk",  speech=> {
   var talk = new SpeechSynthesisUtterance(speech)
    speechSynthesis.speak(talk)
 output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
-speech.onend = ()=> {
+talk.onend = ()=> {
   recognition.start();
 }
 })
