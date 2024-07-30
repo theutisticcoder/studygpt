@@ -42,9 +42,12 @@ output += "<strong>StudyGPT said: </strong>"+ speech + "<br><br>";
 
 
   recognition.start();
-  recognition.onspeechstart = ()=> {
+  setTimeout(()=> {
+    recognition.onspeechstart = ()=> {
     speechSynthesis.pause();
   }
+  }, 8000)
+ 
 })
     </script>
     
