@@ -84,10 +84,13 @@ button{
 
 <body>
   <div id="tabs"></div>
+  <button hidden id="show">Toggle Transcript</button>
+  <button hidden id="chat">Start Voice Chat</button>
   <div id="output"></div>
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
   <button id="convo" onclick="voice()">Convert To Talk</button>
+
   <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
   <script>
     
@@ -99,9 +102,43 @@ button{
     var start;
         const socket = io();
         function voice(){
-          socket.emit("chat", hist);
-          location.href = "speech.html"
+          document.getElementById("tabs").hidden = true;
+          document.getElementById("show").hidden = false;
+          document.getElementById("chat").hidden = false;
+
         }
+        document.getElementById("show").onclick = ()=> {
+  if(document.querySelector("#output").innerHTML.length === 0) document.querySelector("#output").innerHTML = output;
+  else if(document.querySelector("#output").innerHTML.length > 0) document.querySelector("#output").innerHTML = "";
+}
+        var recognition =  new webkitSpeechRecognition();
+  
+  recognition.lang = "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  document.getElementById("chat").onclick = () => {
+  recognition.start();
+  document.getElementById("chat").innerHTML = "Talk Back";
+  recognition.addEventListener("speechend", () => {
+    recognition.stop();
+});
+recognition.onresult = (event) => {
+  var chat = event.results[event.results.length -1][0].transcript;
+  console.log(chat);
+  output += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
+  socket.emit("audio", chat);
+};
+};
+socket.on("talk", speech=> {
+var talk = new SpeechSynthesisUtterance(speech);
+   window.speechSynthesis.speak(talk)
+output += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
+talk.onend = ()=> {
+  recognition.start();
+}
+
+})
         var hist = [];
     var message = 0;
     var lsname = "";
