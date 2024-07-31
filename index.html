@@ -152,14 +152,30 @@ var talk = new SpeechSynthesisUtterance(speech);
    window.speechSynthesis.speak(talk)
    document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
   setTimeout(()=> {recognition.start()},10000);
-recognition.onspeechstart = ()=> {
+  check.onresult = (event) => {
+  const text = event.results[0][0].transcript;
+  if(text.includes("wait")){
+    recognition.start();
+    recognition.onspeechstart = ()=> {
   speechSynthesis.pause();
   recognition.addEventListener("speechend", () => {
     recognition.stop();
 });
+  }
+};
 }
 
 })
+var grammar = "#JSGF V1.0; grammar inter; public <inter> = wait;";
+var check = new webkitSpeechRecognition();
+const speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+check.grammars = speechRecognitionList;
+check.lang = "en-US";
+  check.continuous = false;
+  check.interimResults = false;
+  check.maxAlternatives = 1;
+  check.start();
         var hist = [];
     var message = 0;
     var lsname = "";
