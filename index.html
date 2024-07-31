@@ -120,7 +120,7 @@ var output = "";
   recognition.maxAlternatives = 1;
   document.getElementById("chat").onclick = () => {
   recognition.start();
-  document.getElementById("chat").innerHTML = "Talk Back";
+  document.getElementById("chat").hidden = true;
   recognition.addEventListener("speechend", () => {
     recognition.stop();
 });
