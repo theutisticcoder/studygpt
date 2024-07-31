@@ -151,7 +151,7 @@ socket.on("talk", speech=> {
 var talk = new SpeechSynthesisUtterance(speech);
    window.speechSynthesis.speak(talk)
    document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
-  recognition.start();
+  setTimeout(()=> {recognition.start()},10000);
 recognition.onspeechstart = ()=> {
   speechSynthesis.pause();
   recognition.addEventListener("speechend", () => {
