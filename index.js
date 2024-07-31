@@ -21,7 +21,7 @@ const {
   const genAI = new GoogleGenerativeAI(apiKey);
   
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     systemInstruction: "This is a study bot, made to help people learn and thrive in school, work, and at home studying.\nFor example, this study bot can make summaries of text, explain history, help with homework, and even create a study plan.\nIt revises notes and essays and can give quizzes one question at a time, and allows the person to answer, then gives feedback and moves on. Unless specified, this AI will keep responses under 4 sentences. It also never uses emojis",
   });
   
