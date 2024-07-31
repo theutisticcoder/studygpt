@@ -143,7 +143,7 @@ var output = "";
 recognition.onresult = (event) => {
   var chat = event.results[event.results.length -1][0].transcript;
   console.log(chat);
-  document,querySelector("#output").innerHTML += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
+  document.querySelector("#output").innerHTML += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
   socket.emit("audio", chat);
 };
 };
