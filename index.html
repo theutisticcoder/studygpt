@@ -151,6 +151,8 @@ recognition.onresult = (event) => {
 };
 };
 socket.on("talk", speech=> {
+  check.start();
+  setTimeout(check.stop(), 1000);
 var talk = new SpeechSynthesisUtterance(speech);
    window.speechSynthesis.speak(talk)
    document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
@@ -164,7 +166,11 @@ var talk = new SpeechSynthesisUtterance(speech);
     recognition.stop();
 });
   }
-};
+}
+else{
+  check.start()
+  setTimeout(check.stop(), 1000)
+}
 }
 
 })
