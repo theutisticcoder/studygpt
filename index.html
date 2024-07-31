@@ -82,7 +82,7 @@ button{
 }
 #chat{
   position: absolute;
-  top: 20vh;
+  top: 10vh;
   width: 50vw;
   height: 10vh;
   left: 0vw;
@@ -90,7 +90,7 @@ button{
 }
 #show{
   position: absolute;
-  top: 20vh;
+  top: 10vh;
   width: 50vw;
   height: 10vh;
   left: 50vw;
@@ -121,6 +121,8 @@ var output = "";
         function voice(){
           document.getElementById("show").hidden = false;
           document.getElementById("chat").hidden = false;
+          document.getElementById("output").style.height = "70vh";
+          document.getElementById("output").style.top = "20vh";
         }
         document.getElementById("show").onclick = ()=> {
   if(document.querySelector("#output").hidden === false) document.querySelector("#output").hidden = true;
