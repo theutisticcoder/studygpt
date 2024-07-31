@@ -171,7 +171,7 @@ var talk = new SpeechSynthesisUtterance(speech);
 })
 var grammar = "#JSGF V1.0; grammar inter; public <inter> = wait;";
 var check = new webkitSpeechRecognition();
-const speechRecognitionList = new SpeechGrammarList();
+const speechRecognitionList = new webkitSpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
 check.grammars = speechRecognitionList;
 check.lang = "en-US";
