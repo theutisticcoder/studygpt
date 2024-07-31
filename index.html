@@ -80,6 +80,22 @@ button{
   height: 10vh;
   left: 80vw;
 }
+#chat{
+  position: absolute;
+  top: 20vh;
+  width: 50vw;
+  height: 10vh;
+  left: 0vw;
+  z-index: 100;
+}
+#show{
+  position: absolute;
+  top: 20vh;
+  width: 50vw;
+  height: 10vh;
+  left: 50vw;
+  z-index: 100;
+}
 </style>
 
 <body>
@@ -105,10 +121,6 @@ var output = "";
         function voice(){
           document.getElementById("show").hidden = false;
           document.getElementById("chat").hidden = false;
-          document.getElementById("show").style.top = "20vh";
-          document.getElementById("chat").style.top = "20vh";
-          document.getElementById("show").style.zIndex = "2";
-          document.getElementById("chat").style.zIndex = "2";
         }
         document.getElementById("show").onclick = ()=> {
   if(document.querySelector("#output").hidden === false) document.querySelector("#output").hidden = true;
