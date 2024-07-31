@@ -152,7 +152,7 @@ recognition.onresult = (event) => {
 };
 socket.on("talk", speech=> {
   check.start();
-  setTimeout(check.stop(), 1000);
+  setTimeout(check.stop(), 10000);
 var talk = new SpeechSynthesisUtterance(speech);
    window.speechSynthesis.speak(talk)
    document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
@@ -169,10 +169,12 @@ var talk = new SpeechSynthesisUtterance(speech);
 }
 else{
   check.start()
-  setTimeout(check.stop(), 1000)
+  setTimeout(check.stop(), 10000)
 }
 }
-
+talk.onend = ()=> {
+  recognition.start()
+}
 })
 var grammar = "#JSGF V1.0; grammar inter; public <inter> = wait;";
 var check = new webkitSpeechRecognition();
