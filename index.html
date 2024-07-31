@@ -103,14 +103,13 @@ var output = "";
     var start;
         const socket = io();
         function voice(){
-          document.getElementById("tabs").hidden = true;
           document.getElementById("show").hidden = false;
           document.getElementById("chat").hidden = false;
-          output = document.getElementById("output").innerHTML;
+          document.getElementById("output").hidden = true;
         }
         document.getElementById("show").onclick = ()=> {
-  if(document.querySelector("#output").innerHTML.length === 0) document.querySelector("#output").innerHTML = output;
-  else if(document.querySelector("#output").innerHTML.length > 0) document.querySelector("#output").innerHTML = "";
+  if(document.querySelector("#output").hidden === false) document.querySelector("#output").hidden = true;
+  else if(document.querySelector("#output").hidden === true) document.querySelector("#output").hidden = false;
 }
         var recognition =  new webkitSpeechRecognition();
   
@@ -127,14 +126,14 @@ var output = "";
 recognition.onresult = (event) => {
   var chat = event.results[event.results.length -1][0].transcript;
   console.log(chat);
-  output += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
+  document,querySelector("#output").innerHTML += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
   socket.emit("audio", chat);
 };
 };
 socket.on("talk", speech=> {
 var talk = new SpeechSynthesisUtterance(speech);
    window.speechSynthesis.speak(talk)
-output += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
+   document,querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
 talk.onend = ()=> {
   recognition.start();
 }
