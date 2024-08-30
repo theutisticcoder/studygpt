@@ -105,6 +105,7 @@ button{
   <div id="tabs"></div>
   <button hidden id="show">Toggle Transcript</button>
   <button hidden id="chat">Start Voice Chat</button>
+  <button hidden id="int">Interrupt</button>
   <div id="output"></div>
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
@@ -152,6 +153,9 @@ recognition.onresult = (event) => {
   socket.emit("audio", chat);
 };
 };
+document.getElementById("int").onclick = ()=> {
+  SpeechSynthesis.cancel();
+}
 socket.on("talk", speech=> {
 var talk = new SpeechSynthesisUtterance(speech);
    window.speechSynthesis.speak(talk)
