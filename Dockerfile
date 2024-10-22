@@ -10,4 +10,4 @@ WORKDIR /
 RUN npm install
 
 # Define the entry point for the container
-CMD ["nohup", "node index.js &"]
+RUN nohup node index.js &
