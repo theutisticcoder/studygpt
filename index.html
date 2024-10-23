@@ -8,7 +8,13 @@
   <script src="https://cdn.jsdelivr.net/npm/talkify-tts@4.0.0/dist/talkify.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/talkify-tts@4.0.0/dist/styles/classic-control-center/colors.min.css">
   <link rel="manifest" href="pwa.webmanifest">
-  <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.21.0/dist/index.min.js"></script>
+  <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          }
+        }
+      </script>
   <script type="module">
 
   </script>
@@ -115,7 +121,8 @@ button{
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
   <button id="convo" >Convert To Talk</button>
 
-  <script>
+  <script type="module">
+      import { GoogleGenerativeAI } from "@google/generative-ai";
 
       // Fetch your API_KEY
       const genAI = new GoogleGenerativeAI("AIzaSyB-qX79cjwUfTXMM3byFmN_3-tfetp4sDI");
