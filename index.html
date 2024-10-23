@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyGPT</title>
+  <script src="https://cdn.jsdelivr.net/npm/talkify-tts@4.0.0/dist/talkify.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/talkify-tts@4.0.0/dist/styles/classic-control-center/colors.min.css">
   <link rel="manifest" href="pwa.webmanifest">
   <script type="importmap">
         {
@@ -163,16 +165,15 @@ recognition.onresult = (event) => {
 };
 };
 document.getElementById("int").onclick = ()=> {
-  SpeechSynthesis.cancel();
-}
-socket.on("talk", speech=> {
-var talk = new SpeechSynthesisUtterance(speech);
-   window.speechSynthesis.speak(talk)
-   document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
-   hist.push({role: "model", parts: [{text: speech}]});
-talk.onend = ()=> {
   recognition.start()
 }
+socket.on("talk", speech=> {
+  
+  var player = new talkify.TtsPlayer(); //or new talkify.Html5Player()
+player.playText(speech);
+   document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
+   hist.push({role: "model", parts: [{text: speech}]});
+
 message++;
 localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: chat, messages: message, lsname: lsname, history: hist}));
 
