@@ -121,8 +121,15 @@ button{
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
   <button id="convo" onclick="voice()">Convert To Talk</button>
 
-  <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
-  <script>
+  <script type="module">
+      import { GoogleGenerativeAI } from "@google/generative-ai";
+
+      // Fetch your API_KEY
+      const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+
+
     var chat;
   window.mobileAndTabletCheck = function() {
   let check = false;
@@ -131,7 +138,6 @@ button{
 };
 var output = "";
     var start;
-        const socket = io();
         function voice(){
           document.getElementById("show").hidden = false;
           document.getElementById("chat").hidden = false;
@@ -161,23 +167,14 @@ recognition.onresult = (event) => {
   hist.push({role: "user", parts: [{text: chat}]});
 
   document.querySelector("#output").innerHTML += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
-  socket.emit("audio", chat);
 };
 };
 document.getElementById("int").onclick = ()=> {
   recognition.start()
 }
-socket.on("talk", speech=> {
   
   var player = new talkify.TtsPlayer(); //or new talkify.Html5Player()
-player.playText(speech);
-   document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>"+ speech + "</p><br><br>";
-   hist.push({role: "model", parts: [{text: speech}]});
-
-message++;
-localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: chat, messages: message, lsname: lsname, history: hist}));
-
-})
+  
 var grammar = "#JSGF V1.0; grammar inter; public <inter> = wait;";
 var check = new webkitSpeechRecognition();
 const speechRecognitionList = new webkitSpeechGrammarList();
@@ -203,40 +200,26 @@ check.lang = "en-US";
       lsname = value.lsname;
       message = value.messages;
       document.querySelector("#output").innerHTML = value.out;
-      socket.emit("chat", value.history);
       hist = value.history;
      }
        document.querySelector("#tabs").appendChild(out);  
     }
-    document.querySelector("#input").onkeydown = (e) => {
+    document.querySelector("#input").onkeydown = async (e) => {
       if ((e.key == "Enter" && mobileAndTabletCheck()) || (e.key == "Enter" && (e.ctrlKey || e.metaKey))) {
         message++;
 if(message === 1){
 origin =   document.querySelector("#input").value;
 }
         document.querySelector("#output").innerHTML += "<div class='you'>" + document.querySelector("#input").value + "</div>" + "<br>"
-        socket.emit("submit", document.querySelector("#input").value);
         document.querySelector("#load").hidden = false;
         document.querySelector("#output").scrollTop =  document.querySelector("#output").scrollHeight;
+        const prompt = document.querySelector("#input").value;
+
+const result = await model.generateContent(prompt).response.text();
+document.querySelector("#output").innerHTML += "<div class='gpt'>" + result + "</div>" + "<br>"
+
       }
     }
-    socket.on("return", t => {
-      start = document.querySelector("#input").value;
-      document.querySelector("#input").value = "";
-      document.querySelector("#load").hidden = true;
-      document.querySelector("#output").innerHTML += "<div class='gpt' style='top: 100%'>" + t + "</div>" + "<br>"
-      
-      hist.push({role: "user", parts: [{text: start}]});
-        hist.push({role: "model", parts: [{text: t}]});
-        console.log(hist)
-      if(message === 1){
-        lsname = "c" + localStorage.length;
-      localStorage.setItem("c" + localStorage.length, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname, history: hist}));
-      }
-      else{
-        localStorage.setItem(lsname, JSON.stringify({out: document.querySelector("#output").innerHTML, in: start, messages: message, lsname: lsname, history: hist}));
-      }   
-    })
     document.addEventListener('DOMContentLoaded', init, false);
 function init() {
   if ('serviceWorker' in navigator) {
