@@ -190,20 +190,7 @@ check.lang = "en-US";
     var lsname = "";
     var messages = [];
     var outputs = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const value = JSON.parse(localStorage.getItem("c" + i));
-      outputs.push(value.out);
-     var out = document.createElement("button");
-    out.id = i;
-    out.innerHTML = value.in;
-     out.onclick = (e)=> {
-      lsname = value.lsname;
-      message = value.messages;
-      document.querySelector("#output").innerHTML = value.out;
-      hist = value.history;
-     }
-       document.querySelector("#tabs").appendChild(out);  
-    }
+   
     document.querySelector("#input").onkeydown = async (e) => {
       if ((e.key == "Enter" && mobileAndTabletCheck()) || (e.key == "Enter" && (e.ctrlKey || e.metaKey))) {
         message++;
