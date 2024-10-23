@@ -161,12 +161,16 @@ var output = "";
   recognition.addEventListener("speechend", () => {
     recognition.stop();
 });
-recognition.onresult = (event) => {
+recognition.onresult = async (event) => {
    chat = event.results[event.results.length -1][0].transcript;
   console.log(chat);
   hist.push({role: "user", parts: [{text: chat}]});
 
   document.querySelector("#output").innerHTML += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
+  var result = await model.generateContent(chat)
+result = result.response.text();
+document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>" + result + "</p>" + "<br><br>"
+
 };
 };
 document.getElementById("int").onclick = ()=> {
@@ -205,7 +209,7 @@ origin =   document.querySelector("#input").value;
 var result = await model.generateContent(prompt)
 result = result.response.text();
 document.querySelector("#output").innerHTML += "<div class='gpt'>" + result + "</div>" + "<br>"
-
+document.querySelector("#input").value = ""
       }
     }
     document.addEventListener('DOMContentLoaded', init, false);
