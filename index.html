@@ -202,7 +202,8 @@ origin =   document.querySelector("#input").value;
         document.querySelector("#output").scrollTop =  document.querySelector("#output").scrollHeight;
         const prompt = document.querySelector("#input").value;
 
-const result = await model.generateContent(prompt).response.text();
+var result = await model.generateContent(prompt)
+result = result.response.text();
 document.querySelector("#output").innerHTML += "<div class='gpt'>" + result + "</div>" + "<br>"
 
       }
