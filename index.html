@@ -119,7 +119,7 @@ button{
   <div id="output"></div>
   <h1 hidden id="load">Loading...</h1>
   <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
-  <button id="convo" onclick="voice()">Convert To Talk</button>
+  <button id="convo" >Convert To Talk</button>
 
   <script type="module">
       import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -138,7 +138,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 };
 var output = "";
     var start;
-        function voice(){
+       document.getElementById("convo").onclick = ()=>{
           document.getElementById("show").hidden = false;
           document.getElementById("chat").hidden = false;
           document.getElementById("int").hidden = false;
