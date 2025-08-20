@@ -2,152 +2,185 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Lecture Recorder + AI</title>
+  <title>Lecture Recorder + AI Assistant</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f4f9;
+      margin: 0;
       padding: 20px;
-      max-width: 800px;
-      margin: auto;
+      color: #333;
     }
-    h1 { text-align: center; }
-    button { margin: 5px; padding: 10px 15px; }
-    textarea {
+    h1 {
+      text-align: center;
+      color: #444;
+    }
+    .controls, .ai-section {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button, input[type="file"] {
+      margin: 5px 0;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    textarea, input[type="text"] {
       width: 100%;
-      height: 150px;
-      margin-top: 10px;
       padding: 10px;
-      font-family: monospace;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .output {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <h1>Lecture Recorder + AI</h1>
+  <h1>Lecture Recorder + AI Assistant</h1>
 
-  <div>
-    <label>Gemini API Key: </label>
-    <input type="password" id="apiKeyInput" placeholder="Enter API key" />
-    <button onclick="saveApiKey()">Save Key</button>
+  <div class="controls">
+    <h2>Record Lecture</h2>
+    <button id="startRec">Start Recording</button>
+    <button id="stopRec" disabled>Stop Recording</button>
+    <div class="output" id="liveTranscript"></div>
   </div>
 
-  <div>
-    <button id="startRec">🎙️ Start Recording</button>
-    <button id="stopRec" disabled>⏹️ Stop Recording</button>
-    <input type="file" id="uploadFile" accept="audio/mp3" />
+  <div class="controls">
+    <h2>Upload MP3</h2>
+    <input type="file" id="audioUpload" accept=".mp3,audio/*">
+    <div class="output" id="uploadTranscript">Transcript will appear here...</div>
   </div>
 
-  <h3>Transcript:</h3>
-  <textarea id="transcript"></textarea>
+  <div class="ai-section">
+    <h2>Ask AI (Gemini)</h2>
+    <input type="text" id="apiKeyInput" placeholder="Enter Gemini API Key">
+    <button id="saveKey">Save Key</button>
+    <textarea id="question" placeholder="Ask a question about the transcript or request a summary..."></textarea>
+    <button id="askAI">Ask Gemini</button>
+    <div class="output" id="aiResponse"></div>
+  </div>
 
-  <h3>Ask AI:</h3>
-  <textarea id="question" placeholder="Ask about the lecture..."></textarea>
-  <button onclick="askAI()">Ask</button>
+<script>
+let recognition;
+let finalTranscript = "";
 
-  <h3>Answer:</h3>
-  <textarea id="answer"></textarea>
+// Load API key from localStorage
+const apiKeyInput = document.getElementById("apiKeyInput");
+apiKeyInput.value = localStorage.getItem("gemini_api_key") || "";
 
-  <h3>Summary:</h3>
-  <button onclick="summarize()">Summarize Lecture</button>
-  <textarea id="summary"></textarea>
+// Save key button
+document.getElementById("saveKey").onclick = () => {
+  localStorage.setItem("gemini_api_key", apiKeyInput.value);
+  alert("API Key saved locally!");
+};
 
-  <script>
-    // ==== LocalStorage API Key ====
-    const apiKeyInput = document.getElementById("apiKeyInput");
-    const storedKey = localStorage.getItem("gemini_api_key");
-    if (storedKey) apiKeyInput.value = storedKey;
-
-    function saveApiKey() {
-      localStorage.setItem("gemini_api_key", apiKeyInput.value);
-      alert("API key saved!");
+// Start recording + Web Speech API transcription
+document.getElementById("startRec").onclick = () => {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("Web Speech API not supported in this browser.");
+    return;
+  }
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "en-US";
+  recognition.onresult = (event) => {
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript + " ";
+      } else {
+        interim += event.results[i][0].transcript;
+      }
     }
+    document.getElementById("liveTranscript").innerText = finalTranscript + "\n" + interim;
+  };
+  recognition.start();
+  document.getElementById("startRec").disabled = true;
+  document.getElementById("stopRec").disabled = false;
+};
 
-    // ==== Transcript handling ====
-    const transcriptBox = document.getElementById("transcript");
-    let recognition;
-    let recognizing = false;
+// Stop recording
+document.getElementById("stopRec").onclick = () => {
+  if (recognition) recognition.stop();
+  document.getElementById("startRec").disabled = false;
+  document.getElementById("stopRec").disabled = true;
+};
 
-    if ('webkitSpeechRecognition' in window) {
-      recognition = new webkitSpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
+// Handle MP3 upload (hacky: play + re-transcribe)
+document.getElementById("audioUpload").onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-      recognition.onresult = (event) => {
-        let finalText = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalText += transcript + " ";
-          }
-        }
-        transcriptBox.value += finalText;
-      };
-    } else {
-      alert("Web Speech API not supported in this browser!");
+  const audioURL = URL.createObjectURL(file);
+  const audio = new Audio(audioURL);
+  const recog = new webkitSpeechRecognition();
+  recog.continuous = true;
+  recog.interimResults = false;
+  recog.lang = "en-US";
+  let transcript = "";
+
+  recog.onresult = (event) => {
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript + " ";
     }
+    document.getElementById("uploadTranscript").innerText = transcript;
+    finalTranscript += " " + transcript;
+  };
 
-    document.getElementById("startRec").onclick = () => {
-      if (!recognizing) {
-        recognition.start();
-        recognizing = true;
-        document.getElementById("startRec").disabled = true;
-        document.getElementById("stopRec").disabled = false;
-      }
-    };
+  recog.start();
+  audio.play();
+};
 
-    document.getElementById("stopRec").onclick = () => {
-      if (recognizing) {
-        recognition.stop();
-        recognizing = false;
-        document.getElementById("startRec").disabled = false;
-        document.getElementById("stopRec").disabled = true;
-      }
-    };
+// Ask Gemini
+document.getElementById("askAI").onclick = async () => {
+  const apiKey = apiKeyInput.value.trim();
+  if (!apiKey) {
+    alert("Enter your Gemini API key first!");
+    return;
+  }
+  const prompt = document.getElementById("question").value;
+  const transcript = finalTranscript || document.getElementById("uploadTranscript").innerText;
+  const fullPrompt = "Transcript:\n" + transcript + "\n\nUser request: " + prompt;
 
-    // ==== MP3 Upload (playback + re-transcribe) ====
-    document.getElementById("uploadFile").addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const audio = new Audio(URL.createObjectURL(file));
-        audio.play();
-        recognition.start();
-        audio.onended = () => recognition.stop();
-      }
+  try {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: fullPrompt }] }]
+      })
     });
-
-    // ==== Gemini AI Calls ====
-    async function callGemini(prompt) {
-      const apiKey = localStorage.getItem("gemini_api_key");
-      if (!apiKey) {
-        alert("Please save your Gemini API key first!");
-        return "";
-      }
-
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      });
-
-      const data = await response.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-    }
-
-    async function askAI() {
-      const q = document.getElementById("question").value;
-      const text = transcriptBox.value;
-      const ans = await callGemini("Lecture content: " + text + "\n\nQuestion: " + q);
-      document.getElementById("answer").value = ans;
-    }
-
-    async function summarize() {
-      const text = transcriptBox.value;
-      const summary = await callGemini("Summarize this lecture:\n\n" + text);
-      document.getElementById("summary").value = summary;
-    }
-  </script>
+    const data = await response.json();
+    document.getElementById("aiResponse").innerText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+  } catch (err) {
+    console.error(err);
+    document.getElementById("aiResponse").innerText = "Error calling Gemini API.";
+  }
+};
+</script>
 </body>
 </html>
