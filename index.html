@@ -113,8 +113,8 @@ async function transcribeAudio() {
     };
     reader.readAsDataURL(audioBlob);
 }
-document.querySelector("#transcribe").onclick = transcribeAudio();
-document.querySelector("#key").onclick = saveApiKey();
+document.querySelector("#transcribe").onclick = transcribeAudio;
+document.querySelector("#key").onclick = saveApiKey;
 
 // Gemini AI helper
 async function geminiPrompt(prompt) {
@@ -148,9 +148,9 @@ async function summarizeLecture() {
     const summary = await geminiPrompt(prompt);
     document.getElementById("aiOutput").value = summary;
 }
-document.querySelector("#ask").onclick = askAI();
-document.querySelector("#summary").onclick = summarizeLecture();
-document.querySelector("#download").onclick = downloadNotes();
+document.querySelector("#ask").onclick = askAI;
+document.querySelector("#summary").onclick = summarizeLecture;
+document.querySelector("#download").onclick = downloadNotes;
 
 // Download notes
 function downloadNotes() {
