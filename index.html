@@ -104,213 +104,190 @@
   </div>
 
   <!-- Transformers.js (client-side only) -->
-  <script type="module">
-    // Import Transformers.js (no backend)
-    import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@3.2.0";
+  <script>
+const $ = (id) => document.getElementById(id);
 
-    // Prefer WebGPU if available; allow WASM fallback
-    // (You can omit this; Transformers.js auto-detects)
-    env.backends.onnx.wasm.numThreads = navigator?.hardwareConcurrency ? Math.max(2, Math.floor(navigator.hardwareConcurrency / 2)) : 4;
+// UI elements
+const status = $("status"), prog = $("prog");
+const btnRecord = $("btn-record"), btnStop = $("btn-stop"), btnClear = $("btn-clear");
+const btnTranscribe = $("btn-transcribe"), btnSummarize = $("btn-summarize"), btnAsk = $("btn-ask");
+const transcriptEl = $("transcript"), aiOut = $("aiout"), player = $("player");
+const fileInput = $("file-input"), micNote = $("mic-note"), langBadge = $("lang-badge"), question = $("question");
 
-    const $ = (id) => document.getElementById(id);
-    const status = $("status"), prog = $("prog");
-    const btnRecord = $("btn-record"), btnStop = $("btn-stop"), btnClear = $("btn-clear");
-    const btnTranscribe = $("btn-transcribe");
-    const btnSummarize = $("btn-summarize");
-    const btnAsk = $("btn-ask");
-    const transcriptEl = $("transcript");
-    const aiOut = $("aiout");
-    const player = $("player");
-    const fileInput = $("file-input");
-    const micNote = $("mic-note");
-    const engineNote = $("engine-note");
-    const langBadge = $("lang-badge");
-    const question = $("question");
+let mediaRecorder, chunks = [];
+let audioBlob = null;
 
-    let mediaRecorder, chunks = [];
-    let audioBlob = null;
+// --- API Key handling ---
+function getApiKey() {
+  return localStorage.getItem("openai_api_key");
+}
+async function ensureApiKey() {
+  let key = getApiKey();
+  if (!key) {
+    key = prompt("Enter your OpenAI API key (saved locally in this browser):");
+    if (key) localStorage.setItem("openai_api_key", key.trim());
+  }
+  return key;
+}
+function clearApiKey() {
+  localStorage.removeItem("openai_api_key");
+  alert("API key cleared from localStorage.");
+}
 
-    // Lazy-load models
-    let asr = null, summarizer = null, qa = null;
+// --- Utility ---
+function setStatus(msg, pct = null) {
+  status.textContent = msg;
+  if (pct === null) prog.removeAttribute("value");
+  else prog.value = pct;
+}
 
-    async function warmup() {
-      engineNote.textContent = "warming up…";
-      // We instantiate pipelines but defer heavy model weight fetch until first use.
-      // (Transformers.js may still fetch some configs.)
-      asr = await pipeline("automatic-speech-recognition", "Xenova/whisper-tiny.en");
-      summarizer = await pipeline("text2text-generation", "Xenova/t5-small");
-      qa = await pipeline("question-answering", "Xenova/distilbert-base-cased-distilled-squad");
-      engineNote.textContent = "ready";
-      btnTranscribe.disabled = !audioBlob;
-      btnSummarize.disabled = transcriptEl.value.trim().length === 0;
-      btnAsk.disabled = transcriptEl.value.trim().length === 0;
-    }
-    warmup().catch(e => { engineNote.textContent = "error"; console.error(e); });
-
-    function setStatus(msg, pct = null) {
-      status.textContent = msg;
-      if (pct === null) { prog.removeAttribute("value"); }
-      else { prog.value = pct; }
-    }
-
-    // Recording
-    btnRecord.addEventListener("click", async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        chunks = [];
-        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-        mediaRecorder.onstop = () => {
-          audioBlob = new Blob(chunks, { type: "audio/webm" });
-          player.src = URL.createObjectURL(audioBlob);
-          btnTranscribe.disabled = false;
-          btnClear.disabled = true; // delay until we finish using it
-          setStatus(`Recorded ${Math.round(audioBlob.size / 1024)} KB.`, 0);
-        };
-        mediaRecorder.start();
-        btnRecord.disabled = true;
-        btnStop.disabled = true; // enable after 300ms to prevent accidental rapid clicks
-        setTimeout(() => btnStop.disabled = false, 300);
-        btnClear.disabled = true;
-        micNote.textContent = "recording…";
-        setStatus("Recording…");
-      } catch (err) {
-        console.error(err);
-        setStatus("Microphone permission denied or unavailable.", 0);
-        micNote.textContent = "unavailable";
-      }
-    });
-
-    btnStop.addEventListener("click", () => {
-      mediaRecorder?.stop();
-      mediaRecorder?.stream.getTracks().forEach(t => t.stop());
-      btnRecord.disabled = false;
-      btnStop.disabled = true;
+// --- Recording ---
+btnRecord.addEventListener("click", async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    chunks = [];
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      audioBlob = new Blob(chunks, { type: "audio/webm" });
+      player.src = URL.createObjectURL(audioBlob);
+      btnTranscribe.disabled = false;
       btnClear.disabled = false;
-      micNote.textContent = "stopped";
-    });
+      setStatus(`Recorded ${Math.round(audioBlob.size / 1024)} KB.`, 0);
+    };
+    mediaRecorder.start();
+    btnRecord.disabled = true;
+    btnStop.disabled = false;
+    btnClear.disabled = true;
+    micNote.textContent = "recording…";
+    setStatus("Recording…");
+  } catch (err) {
+    console.error(err);
+    setStatus("Microphone unavailable.", 0);
+    micNote.textContent = "error";
+  }
+});
 
-    btnClear.addEventListener("click", () => {
-      audioBlob = null;
-      player.removeAttribute("src");
-      transcriptEl.value = "";
-      aiOut.value = "";
-      btnTranscribe.disabled = true;
-      btnSummarize.disabled = true;
-      btnAsk.disabled = true;
-      setStatus("Cleared.", 0);
-      langBadge.textContent = "—";
-    });
+btnStop.addEventListener("click", () => {
+  mediaRecorder?.stop();
+  mediaRecorder?.stream.getTracks().forEach(t => t.stop());
+  btnRecord.disabled = false;
+  btnStop.disabled = true;
+  micNote.textContent = "stopped";
+});
 
-    // Allow file import
-    fileInput.addEventListener("change", () => {
-      if (fileInput.files?.[0]) {
-        audioBlob = fileInput.files[0];
-        player.src = URL.createObjectURL(audioBlob);
-        btnTranscribe.disabled = false;
-        btnClear.disabled = false;
-        setStatus(`Loaded file: ${audioBlob.name || "audio"} (${Math.round(audioBlob.size/1024)} KB).`, 0);
-      }
-    });
+btnClear.addEventListener("click", () => {
+  audioBlob = null;
+  player.removeAttribute("src");
+  transcriptEl.value = "";
+  aiOut.value = "";
+  btnTranscribe.disabled = true;
+  btnSummarize.disabled = true;
+  btnAsk.disabled = true;
+  langBadge.textContent = "—";
+  setStatus("Cleared.", 0);
+});
 
-    // Decode and resample to 16k mono Float32 for Whisper
-    async function blobToFloat32Mono16k(blob) {
-      const ab = await blob.arrayBuffer();
-      const ac = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 16000 * 60 * 60, 16000); // up to 1h buffer @16k
-      const temp = new (window.AudioContext || window.webkitAudioContext)();
-      const decoded = await temp.decodeAudioData(ab.slice(0));
-      // Resample using OfflineAudioContext render
-      const offline = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, Math.ceil(decoded.duration * 16000), 16000);
-      const src = offline.createBufferSource();
-      // Mixdown to mono
-      const mono = offline.createBuffer(1, decoded.length, decoded.sampleRate);
-      const ch0 = mono.getChannelData(0);
-      for (let i = 0; i < decoded.length; i++) {
-        let sum = 0;
-        for (let c = 0; c < decoded.numberOfChannels; c++) sum += decoded.getChannelData(c)[i] || 0;
-        ch0[i] = sum / decoded.numberOfChannels;
-      }
-      src.buffer = mono;
-      src.connect(offline.destination);
-      src.start(0);
-      const rendered = await offline.startRendering();
-      const out = rendered.getChannelData(0);
-      temp.close();
-      return out;
-    }
+// --- File Upload ---
+fileInput.addEventListener("change", () => {
+  if (fileInput.files?.[0]) {
+    audioBlob = fileInput.files[0];
+    player.src = URL.createObjectURL(audioBlob);
+    btnTranscribe.disabled = false;
+    btnClear.disabled = false;
+    setStatus(`Loaded file: ${audioBlob.name} (${Math.round(audioBlob.size/1024)} KB).`, 0);
+  }
+});
 
-    // Transcribe
-    btnTranscribe.addEventListener("click", async () => {
-      if (!audioBlob) return;
-      try {
-        setStatus("Decoding & resampling audio…", 5);
-        const audio = await blobToFloat32Mono16k(audioBlob);
+// --- API Calls ---
+async function transcribeAudio(blob) {
+  const key = await ensureApiKey();
+  if (!key) return "No API key provided.";
+  setStatus("Uploading audio for transcription…");
+  const formData = new FormData();
+  formData.append("file", blob, "lecture.webm");
+  formData.append("model", "whisper-1");
+  const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}` },
+    body: formData
+  });
+  const data = await resp.json();
+  return data.text;
+}
 
-        setStatus("Running speech-to-text in browser… (first time may download ~75MB)", 10);
-        const result = await asr(audio, {
-          chunk_length_s: 30,
-          stride_length_s: 5,
-          return_timestamps: true,
-          // Whisper tiny.en assumes English; change model if you need multilingual
-        });
+async function summarizeText(text) {
+  const key = await ensureApiKey();
+  if (!key) return "No API key provided.";
+  setStatus("Summarizing via API…");
+  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${key}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "You are a helpful assistant that summarizes lectures." },
+        { role: "user", content: "Summarize this lecture:\n\n" + text }
+      ]
+    })
+  });
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
 
-        const text = typeof result.text === "string" ? result.text : (result?.text ?? "");
-        transcriptEl.value = text.trim();
-        langBadge.textContent = result?.language ?? "en";
-        setStatus("Transcription complete ✔︎", 100);
+async function askQuestion(text, q) {
+  const key = await ensureApiKey();
+  if (!key) return "No API key provided.";
+  setStatus("Asking question via API…");
+  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${key}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "You are a helpful assistant for Q&A." },
+        { role: "user", content: `Lecture transcript:\n${text}\n\nQuestion: ${q}` }
+      ]
+    })
+  });
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
 
-        btnSummarize.disabled = transcriptEl.value.trim().length === 0;
-        btnAsk.disabled = transcriptEl.value.trim().length === 0;
-        btnClear.disabled = false;
-      } catch (e) {
-        console.error(e);
-        setStatus("Transcription error. See console for details.", 0);
-      }
-    });
+// --- Button Handlers ---
+btnTranscribe.addEventListener("click", async () => {
+  if (!audioBlob) return;
+  const text = await transcribeAudio(audioBlob);
+  transcriptEl.value = text;
+  langBadge.textContent = "en";
+  setStatus("Transcription complete ✔︎", 100);
+  btnSummarize.disabled = !text.trim();
+  btnAsk.disabled = !text.trim();
+});
 
-    // Summarize
-    btnSummarize.addEventListener("click", async () => {
-      const src = transcriptEl.value.trim();
-      if (!src) return;
-      try {
-        setStatus("Summarizing locally… (first run may fetch ~55–100MB)", 20);
-        // T5 uses "summarize:" prompt for summarization behavior
-        const prompt = "summarize: " + src.slice(0, 6000); // keep prompt modest for speed
-        const out = await summarizer(prompt, {
-          max_new_tokens: 200,
-          temperature: 0.1,
-        });
-        const text = Array.isArray(out) ? out[0]?.generated_text : out?.generated_text;
-        aiOut.value = (text || "").trim();
-        setStatus("Summary ready ✔︎", 100);
-      } catch (e) {
-        console.error(e);
-        setStatus("Summarization error.", 0);
-      }
-    });
+btnSummarize.addEventListener("click", async () => {
+  const txt = transcriptEl.value.trim();
+  if (!txt) return;
+  aiOut.value = await summarizeText(txt);
+  setStatus("Summary ready ✔︎", 100);
+});
 
-    // Question Answering
-    btnAsk.addEventListener("click", async () => {
-      const context = transcriptEl.value.trim();
-      const q = question.value.trim();
-      if (!context || !q) return;
-      try {
-        setStatus("Answering question against transcript…", 30);
-        const out = await qa({ question: q, context });
-        aiOut.value = `Q: ${q}\nA: ${out.answer}\n(score: ${out.score.toFixed(3)})`;
-        setStatus("Answer ready ✔︎", 100);
-      } catch (e) {
-        console.error(e);
-        setStatus("Q&A error.", 0);
-      }
-    });
+btnAsk.addEventListener("click", async () => {
+  const txt = transcriptEl.value.trim();
+  const q = question.value.trim();
+  if (!txt || !q) return;
+  aiOut.value = await askQuestion(txt, q);
+  setStatus("Answer ready ✔︎", 100);
+});
 
-    // Enable/disable buttons based on text presence
-    transcriptEl.addEventListener("input", () => {
-      const has = transcriptEl.value.trim().length > 0;
-      btnSummarize.disabled = !has;
-      btnAsk.disabled = !has;
-    });
-  </script>
+// allow manual key reset via console
+window.clearApiKey = clearApiKey;
+</script>
 </body>
 </html>
