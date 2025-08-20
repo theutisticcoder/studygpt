@@ -1,228 +1,316 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
- 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyGPT</title>
-  <script src="https://cdn.jsdelivr.net/npm/talkify-tts@4.0.0/dist/talkify.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/talkify-tts@4.0.0/dist/styles/classic-control-center/colors.min.css">
-  <link rel="manifest" href="pwa.webmanifest">
-  <script type="importmap">
-        {
-          "imports": {
-            "@google/generative-ai": "https://esm.run/@google/generative-ai"
-          }
-        }
-      </script>
-  <script type="module">
-
-  </script>
-</head>
-<style>
-  body, html{
-    overflow: hidden;
-  }
-  #output {
-    text-wrap: pretty;
-    font-size: 35pt;
-    top: 10vh;
-    height: 80vh;
-    width: 100vw;
-    background: black;
-    color: white;
-    border-radius: 5px;
-    position: absolute;
-    overflow-y: scroll;
-  }
-
-  .you {
-    border-radius: 5px;
-    position: absolute;
-    left: 50%;
-    width: 50%;
-    text-wrap: pretty;
-    font-size: 20pt;
-    color: white;
-    background: blue;
-  }
-
-  .gpt {
-    border-radius: 5px;
-    position: static;
-    width: 50%;
-    text-wrap: pretty;
-    font-size: 20pt;
-    color: white;
-    background: darkslategray;
-  }
-
-  #input {
-    height: 10vh;
-    width: 80vw;
-    position: absolute;
-    top: 90vh;
-  }
-  #tabs{
-    width: 1000vw;
-    height: 10vh;
-    overflow-x: scroll;
-    position: absolute;
-    background: black;
-  }
-button{
-  position: static;
-  background: black;
-  border: 1px solid white;
-  font-size: 20pt;
-  color: white;
-
-}
-#convo{
-  position: absolute;
-  top: 90vh;
-  width: 20vw;
-  height: 10vh;
-  left: 80vw;
-}
-#chat{
-  position: absolute;
-  top: 10vh;
-  width: 33.3vw;
-  height: 10vh;
-  left: 0vw;
-  z-index: 100;
-}
-#show{
-  position: absolute;
-  top: 10vh;
-  width: 33.4vw;
-  height: 10vh;
-  left: 33.3vw;
-  z-index: 100;
-}
-#int{
-  position: absolute;
-  top: 10vh;
-  width: 33.3vw;
-  height: 10vh;
-  left: 66.7vw;
-  z-index: 100;
-}
-</style>
-
-<body>
-  <div id="tabs"></div>
-  <button hidden id="show">Toggle Transcript</button>
-  <button hidden id="chat">Start Voice Chat</button>
-  <button hidden id="int">Interrupt</button>
-  <div id="output"></div>
-  <h1 hidden id="load">Loading...</h1>
-  <textarea id="input" placeholder="Press control or command enter to chat..."></textarea>
-  <button id="convo" >Convert To Talk</button>
-
-  <script type="module">
-      import { GoogleGenerativeAI } from "@google/generative-ai";
-
-      // Fetch your API_KEY
-      const genAI = new GoogleGenerativeAI("AIzaSyB-qX79cjwUfTXMM3byFmN_3-tfetp4sDI");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-
-
-    var chat;
-  window.mobileAndTabletCheck = function() {
-  let check = false;
-  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
-  return check;
-};
-var output = "";
-    var start;
-       document.getElementById("convo").onclick = ()=>{
-          document.getElementById("show").hidden = false;
-          document.getElementById("chat").hidden = false;
-          document.getElementById("int").hidden = false;
-          document.getElementById("output").style.height = "70vh";
-          document.getElementById("output").style.top = "20vh";
-        }
-        document.getElementById("show").onclick = ()=> {
-  if(document.querySelector("#output").hidden === false) document.querySelector("#output").hidden = true;
-  else if(document.querySelector("#output").hidden === true) document.querySelector("#output").hidden = false;
-}
-        var recognition =  new webkitSpeechRecognition();
-  
-  recognition.lang = "en-US";
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  document.getElementById("chat").onclick = () => {
-  recognition.start();
-  document.getElementById("chat").hidden = true;
-  recognition.addEventListener("speechend", () => {
-    recognition.stop();
-});
-recognition.onresult = async (event) => {
-   chat = event.results[event.results.length -1][0].transcript;
-  console.log(chat);
-  hist.push({role: "user", parts: [{text: chat}]});
-
-  document.querySelector("#output").innerHTML += "<p class='you'><strong>You said: </strong>"+chat + "</p><br><br>";
-  var result = await model.generateContent(chat)
-result = result.response.text();
-document.querySelector("#output").innerHTML += "<p class='gpt'><strong>StudyGPT said: </strong>" + result + "</p>" + "<br><br>"
-
-};
-};
-document.getElementById("int").onclick = ()=> {
-  recognition.start()
-}
-  
-  var player = new talkify.TtsPlayer(); //or new talkify.Html5Player()
-  
-var grammar = "#JSGF V1.0; grammar inter; public <inter> = wait;";
-var check = new webkitSpeechRecognition();
-const speechRecognitionList = new webkitSpeechGrammarList();
-speechRecognitionList.addFromString(grammar, 1);
-check.grammars = speechRecognitionList;
-check.lang = "en-US";
-  check.continuous = false;
-  check.interimResults = false;
-  check.maxAlternatives = 1;
-  check.start();
-        var hist = [];
-    var message = 0;
-    var lsname = "";
-    var messages = [];
-    var outputs = [];
-   
-    document.querySelector("#input").onkeydown = async (e) => {
-      if ((e.key == "Enter" && mobileAndTabletCheck()) || (e.key == "Enter" && (e.ctrlKey || e.metaKey))) {
-        message++;
-if(message === 1){
-origin =   document.querySelector("#input").value;
-}
-        document.querySelector("#output").innerHTML += "<div class='you'>" + document.querySelector("#input").value + "</div>" + "<br>"
-        document.querySelector("#load").hidden = false;
-        document.querySelector("#output").scrollTop =  document.querySelector("#output").scrollHeight;
-        const prompt = document.querySelector("#input").value;
-
-var result = await model.generateContent(prompt)
-result = result.response.text();
-document.querySelector("#output").innerHTML += "<div class='gpt'>" + result + "</div>" + "<br>"
-document.querySelector("#input").value = ""
-      }
+  <meta charset="utf-8" />
+  <title>Lecture Capture – Local AI (No Backend)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+    body { margin: 0; background: #0b0d12; color: #eef1f6; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px; }
+    header { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
+    h1 { font-size: 1.3rem; margin: 0; font-weight: 700; letter-spacing: .2px; }
+    .card { background: #121624; border: 1px solid #1f2637; border-radius: 14px; padding: 16px; margin: 14px 0; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    button { border: 1px solid #334; background: #1a2140; color: #fff; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .ghost { background: transparent; }
+    .primary { background: #3451ff; border-color: #3451ff; }
+    .ok { color: #74ff9f; }
+    .warn { color: #ffcb74; }
+    .bad { color: #ff7d7d; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    textarea, input { width: 100%; background: #0e1220; color: #e8ecf8; border: 1px solid #1f2637; border-radius: 10px; padding: 10px 12px; }
+    textarea { min-height: 180px; resize: vertical; }
+    .split { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 900px) {
+      .split { grid-template-columns: 1.4fr 1fr; }
     }
-    document.addEventListener('DOMContentLoaded', init, false);
-function init() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then((reg) => {
-        console.log('Service worker registered -->', reg);
-      }, (err) => {
-        console.error('Service worker not registered -->', err);
-      });
-  }
-}
-  </script>
+    progress { width: 100%; height: 10px; accent-color: #3451ff; }
+    .tag { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid #1f2637; background: #0e1220; border-radius: 999px; white-space: nowrap; }
+    .muted { opacity: .8; }
+    .small { font-size: .9rem; }
+    .tiny { font-size: .8rem; opacity: .7; }
+    .badge { font-size: .75rem; background: #1f2637; border-radius: 6px; padding: 2px 6px; }
+    audio { width: 100%; margin-top: 8px; }
+    .right { margin-left: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🎙️ Lecture Capture (All Local · No Backend)</h1>
+      <span id="engine-status" class="tag muted small">Models: <span id="engine-note" class="mono">loading…</span></span>
+      <span id="device-status" class="tag muted small">Mic: <span id="mic-note" class="mono">idle</span></span>
+      <span class="right tiny">First run downloads models to your browser cache.</span>
+    </header>
 
+    <!-- Record -->
+    <div class="card">
+      <div class="row">
+        <button id="btn-record" class="primary">Start recording</button>
+        <button id="btn-stop" disabled>Stop</button>
+        <button id="btn-clear" class="ghost" disabled>Clear</button>
+        <span class="muted small">Tip: you can also drop an audio file below.</span>
+      </div>
+      <div class="row" style="margin-top: 8px;">
+        <input type="file" id="file-input" accept="audio/*" />
+      </div>
+      <div style="margin-top: 12px;">
+        <progress id="prog" max="100" value="0"></progress>
+        <div class="tiny" id="status">Ready.</div>
+        <audio id="player" controls></audio>
+      </div>
+    </div>
+
+    <!-- Transcript + AI -->
+    <div class="split">
+      <div class="card">
+        <div class="row">
+          <strong>Transcript</strong>
+          <span class="badge" id="lang-badge">—</span>
+          <button id="btn-transcribe" class="right" disabled>Transcribe</button>
+        </div>
+        <textarea id="transcript" placeholder="Your transcript will appear here…"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <strong>AI Tools</strong>
+        </div>
+        <div class="row" style="margin-top: 8px;">
+          <button id="btn-summarize" disabled>Summarize transcript</button>
+        </div>
+        <div class="row" style="margin-top: 8px;">
+          <input id="question" placeholder="Ask a question about this lecture…" />
+          <button id="btn-ask" disabled>Ask</button>
+        </div>
+        <div style="margin-top: 10px;">
+          <strong>AI Output</strong>
+          <textarea id="aiout" class="mono" placeholder="Summaries and answers will appear here…" style="min-height:160px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card tiny muted">
+      <div><strong>Models (downloaded to your browser on first use):</strong></div>
+      <ul>
+        <li>Speech-to-text: <span class="mono">Xenova/whisper-tiny.en</span> (English; small and fast)</li>
+        <li>Summarization: <span class="mono">Xenova/t5-small</span> via text2text-generation (“summarize:” prompt)</li>
+        <li>Q&A: <span class="mono">Xenova/distilbert-base-cased-distilled-squad</span> (extractive answers from transcript)</li>
+      </ul>
+      <div>Everything runs in your browser using WebAssembly/WebGPU. No keys, no servers.</div>
+    </div>
+  </div>
+
+  <!-- Transformers.js (client-side only) -->
+  <script type="module">
+    // Import Transformers.js (no backend)
+    import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@3.2.0";
+
+    // Prefer WebGPU if available; allow WASM fallback
+    // (You can omit this; Transformers.js auto-detects)
+    env.backends.onnx.wasm.numThreads = navigator?.hardwareConcurrency ? Math.max(2, Math.floor(navigator.hardwareConcurrency / 2)) : 4;
+
+    const $ = (id) => document.getElementById(id);
+    const status = $("status"), prog = $("prog");
+    const btnRecord = $("btn-record"), btnStop = $("btn-stop"), btnClear = $("btn-clear");
+    const btnTranscribe = $("btn-transcribe");
+    const btnSummarize = $("btn-summarize");
+    const btnAsk = $("btn-ask");
+    const transcriptEl = $("transcript");
+    const aiOut = $("aiout");
+    const player = $("player");
+    const fileInput = $("file-input");
+    const micNote = $("mic-note");
+    const engineNote = $("engine-note");
+    const langBadge = $("lang-badge");
+    const question = $("question");
+
+    let mediaRecorder, chunks = [];
+    let audioBlob = null;
+
+    // Lazy-load models
+    let asr = null, summarizer = null, qa = null;
+
+    async function warmup() {
+      engineNote.textContent = "warming up…";
+      // We instantiate pipelines but defer heavy model weight fetch until first use.
+      // (Transformers.js may still fetch some configs.)
+      asr = await pipeline("automatic-speech-recognition", "Xenova/whisper-tiny.en");
+      summarizer = await pipeline("text2text-generation", "Xenova/t5-small");
+      qa = await pipeline("question-answering", "Xenova/distilbert-base-cased-distilled-squad");
+      engineNote.textContent = "ready";
+      btnTranscribe.disabled = !audioBlob;
+      btnSummarize.disabled = transcriptEl.value.trim().length === 0;
+      btnAsk.disabled = transcriptEl.value.trim().length === 0;
+    }
+    warmup().catch(e => { engineNote.textContent = "error"; console.error(e); });
+
+    function setStatus(msg, pct = null) {
+      status.textContent = msg;
+      if (pct === null) { prog.removeAttribute("value"); }
+      else { prog.value = pct; }
+    }
+
+    // Recording
+    btnRecord.addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        chunks = [];
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          audioBlob = new Blob(chunks, { type: "audio/webm" });
+          player.src = URL.createObjectURL(audioBlob);
+          btnTranscribe.disabled = false;
+          btnClear.disabled = true; // delay until we finish using it
+          setStatus(`Recorded ${Math.round(audioBlob.size / 1024)} KB.`, 0);
+        };
+        mediaRecorder.start();
+        btnRecord.disabled = true;
+        btnStop.disabled = true; // enable after 300ms to prevent accidental rapid clicks
+        setTimeout(() => btnStop.disabled = false, 300);
+        btnClear.disabled = true;
+        micNote.textContent = "recording…";
+        setStatus("Recording…");
+      } catch (err) {
+        console.error(err);
+        setStatus("Microphone permission denied or unavailable.", 0);
+        micNote.textContent = "unavailable";
+      }
+    });
+
+    btnStop.addEventListener("click", () => {
+      mediaRecorder?.stop();
+      mediaRecorder?.stream.getTracks().forEach(t => t.stop());
+      btnRecord.disabled = false;
+      btnStop.disabled = true;
+      btnClear.disabled = false;
+      micNote.textContent = "stopped";
+    });
+
+    btnClear.addEventListener("click", () => {
+      audioBlob = null;
+      player.removeAttribute("src");
+      transcriptEl.value = "";
+      aiOut.value = "";
+      btnTranscribe.disabled = true;
+      btnSummarize.disabled = true;
+      btnAsk.disabled = true;
+      setStatus("Cleared.", 0);
+      langBadge.textContent = "—";
+    });
+
+    // Allow file import
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files?.[0]) {
+        audioBlob = fileInput.files[0];
+        player.src = URL.createObjectURL(audioBlob);
+        btnTranscribe.disabled = false;
+        btnClear.disabled = false;
+        setStatus(`Loaded file: ${audioBlob.name || "audio"} (${Math.round(audioBlob.size/1024)} KB).`, 0);
+      }
+    });
+
+    // Decode and resample to 16k mono Float32 for Whisper
+    async function blobToFloat32Mono16k(blob) {
+      const ab = await blob.arrayBuffer();
+      const ac = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 16000 * 60 * 60, 16000); // up to 1h buffer @16k
+      const temp = new (window.AudioContext || window.webkitAudioContext)();
+      const decoded = await temp.decodeAudioData(ab.slice(0));
+      // Resample using OfflineAudioContext render
+      const offline = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, Math.ceil(decoded.duration * 16000), 16000);
+      const src = offline.createBufferSource();
+      // Mixdown to mono
+      const mono = offline.createBuffer(1, decoded.length, decoded.sampleRate);
+      const ch0 = mono.getChannelData(0);
+      for (let i = 0; i < decoded.length; i++) {
+        let sum = 0;
+        for (let c = 0; c < decoded.numberOfChannels; c++) sum += decoded.getChannelData(c)[i] || 0;
+        ch0[i] = sum / decoded.numberOfChannels;
+      }
+      src.buffer = mono;
+      src.connect(offline.destination);
+      src.start(0);
+      const rendered = await offline.startRendering();
+      const out = rendered.getChannelData(0);
+      temp.close();
+      return out;
+    }
+
+    // Transcribe
+    btnTranscribe.addEventListener("click", async () => {
+      if (!audioBlob) return;
+      try {
+        setStatus("Decoding & resampling audio…", 5);
+        const audio = await blobToFloat32Mono16k(audioBlob);
+
+        setStatus("Running speech-to-text in browser… (first time may download ~75MB)", 10);
+        const result = await asr(audio, {
+          chunk_length_s: 30,
+          stride_length_s: 5,
+          return_timestamps: true,
+          // Whisper tiny.en assumes English; change model if you need multilingual
+        });
+
+        const text = typeof result.text === "string" ? result.text : (result?.text ?? "");
+        transcriptEl.value = text.trim();
+        langBadge.textContent = result?.language ?? "en";
+        setStatus("Transcription complete ✔︎", 100);
+
+        btnSummarize.disabled = transcriptEl.value.trim().length === 0;
+        btnAsk.disabled = transcriptEl.value.trim().length === 0;
+        btnClear.disabled = false;
+      } catch (e) {
+        console.error(e);
+        setStatus("Transcription error. See console for details.", 0);
+      }
+    });
+
+    // Summarize
+    btnSummarize.addEventListener("click", async () => {
+      const src = transcriptEl.value.trim();
+      if (!src) return;
+      try {
+        setStatus("Summarizing locally… (first run may fetch ~55–100MB)", 20);
+        // T5 uses "summarize:" prompt for summarization behavior
+        const prompt = "summarize: " + src.slice(0, 6000); // keep prompt modest for speed
+        const out = await summarizer(prompt, {
+          max_new_tokens: 200,
+          temperature: 0.1,
+        });
+        const text = Array.isArray(out) ? out[0]?.generated_text : out?.generated_text;
+        aiOut.value = (text || "").trim();
+        setStatus("Summary ready ✔︎", 100);
+      } catch (e) {
+        console.error(e);
+        setStatus("Summarization error.", 0);
+      }
+    });
+
+    // Question Answering
+    btnAsk.addEventListener("click", async () => {
+      const context = transcriptEl.value.trim();
+      const q = question.value.trim();
+      if (!context || !q) return;
+      try {
+        setStatus("Answering question against transcript…", 30);
+        const out = await qa({ question: q, context });
+        aiOut.value = `Q: ${q}\nA: ${out.answer}\n(score: ${out.score.toFixed(3)})`;
+        setStatus("Answer ready ✔︎", 100);
+      } catch (e) {
+        console.error(e);
+        setStatus("Q&A error.", 0);
+      }
+    });
+
+    // Enable/disable buttons based on text presence
+    transcriptEl.addEventListener("input", () => {
+      const has = transcriptEl.value.trim().length > 0;
+      btnSummarize.disabled = !has;
+      btnAsk.disabled = !has;
+    });
+  </script>
+</body>
 </html>
