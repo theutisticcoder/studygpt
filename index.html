@@ -107,8 +107,7 @@ async function transcribeAudio() {
             }]
         };
        var resp = model.generateContent(requestBody);
-            const data = await resp.json();
-            document.getElementById("transcription").value = data.candidates?.[0]?.content?.parts?.[0]?.text || "❌ Transcription failed.";
+            const data = resp.text;
        
     };
     reader.readAsDataURL(audioBlob);
@@ -120,14 +119,9 @@ document.querySelector("#key").onclick = saveApiKey;
 async function geminiPrompt(prompt) {
     const apiKey = localStorage.getItem("GEMINI_API_KEY");
     if (!apiKey) { alert("Please save your Gemini API key first."); return; }
-    try {
         const resp = model.generateContent({text: prompt});
-        const data = await resp.json();
-        return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
-    } catch (err) {
-        console.error(err);
-        return "AI request failed.";
-    }
+        return resp.text;
+   
 }
 
 // Ask question
