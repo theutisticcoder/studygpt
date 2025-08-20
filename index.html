@@ -1,293 +1,154 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Lecture Capture – Local AI (No Backend)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Lecture Assistant (Gemini)</title>
   <style>
-    :root { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
-    body { margin: 0; background: #0b0d12; color: #eef1f6; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 24px; }
-    header { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
-    h1 { font-size: 1.3rem; margin: 0; font-weight: 700; letter-spacing: .2px; }
-    .card { background: #121624; border: 1px solid #1f2637; border-radius: 14px; padding: 16px; margin: 14px 0; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    button { border: 1px solid #334; background: #1a2140; color: #fff; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
-    button:disabled { opacity: .6; cursor: not-allowed; }
-    .ghost { background: transparent; }
-    .primary { background: #3451ff; border-color: #3451ff; }
-    .ok { color: #74ff9f; }
-    .warn { color: #ffcb74; }
-    .bad { color: #ff7d7d; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    textarea, input { width: 100%; background: #0e1220; color: #e8ecf8; border: 1px solid #1f2637; border-radius: 10px; padding: 10px 12px; }
-    textarea { min-height: 180px; resize: vertical; }
-    .split { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 900px) {
-      .split { grid-template-columns: 1.4fr 1fr; }
-    }
-    progress { width: 100%; height: 10px; accent-color: #3451ff; }
-    .tag { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid #1f2637; background: #0e1220; border-radius: 999px; white-space: nowrap; }
-    .muted { opacity: .8; }
-    .small { font-size: .9rem; }
-    .tiny { font-size: .8rem; opacity: .7; }
-    .badge { font-size: .75rem; background: #1f2637; border-radius: 6px; padding: 2px 6px; }
-    audio { width: 100%; margin-top: 8px; }
-    .right { margin-left: auto; }
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f4f4f9; }
+    h1 { color: #333; }
+    button { margin: 0.5em 0; padding: 0.6em 1em; border: none; border-radius: 5px; cursor: pointer; background: #4CAF50; color: white; }
+    button:hover { background: #45a049; }
+    input[type="file"], input[type="text"] { margin: 0.5em 0; padding: 0.5em; width: 100%; max-width: 400px; }
+    textarea { width: 100%; height: 150px; margin: 1em 0; padding: 0.7em; }
+    .output { background: #fff; padding: 1em; border-radius: 5px; margin-top: 1em; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>🎙️ Lecture Capture (All Local · No Backend)</h1>
-      <span id="engine-status" class="tag muted small">Models: <span id="engine-note" class="mono">loading…</span></span>
-      <span id="device-status" class="tag muted small">Mic: <span id="mic-note" class="mono">idle</span></span>
-      <span class="right tiny">First run downloads models to your browser cache.</span>
-    </header>
+  <h1>🎙️ Lecture Assistant (Gemini)</h1>
 
-    <!-- Record -->
-    <div class="card">
-      <div class="row">
-        <button id="btn-record" class="primary">Start recording</button>
-        <button id="btn-stop" disabled>Stop</button>
-        <button id="btn-clear" class="ghost" disabled>Clear</button>
-        <span class="muted small">Tip: you can also drop an audio file below.</span>
-      </div>
-      <div class="row" style="margin-top: 8px;">
-        <input type="file" id="file-input" accept="audio/*,.mp3" />
-      </div>
-      <div style="margin-top: 12px;">
-        <progress id="prog" max="100" value="0"></progress>
-        <div class="tiny" id="status">Ready.</div>
-        <audio id="player" controls></audio>
-      </div>
-    </div>
+  <h3>🔑 API Key</h3>
+  <input type="text" id="apiKeyInput" placeholder="Enter Gemini API Key">
+  <button onclick="saveApiKey()">Save API Key</button>
 
-    <!-- Transcript + AI -->
-    <div class="split">
-      <div class="card">
-        <div class="row">
-          <strong>Transcript</strong>
-          <span class="badge" id="lang-badge">—</span>
-          <button id="btn-transcribe" class="right" disabled>Transcribe</button>
-        </div>
-        <textarea id="transcript" placeholder="Your transcript will appear here…"></textarea>
-      </div>
+  <h3>🎤 Record Lecture</h3>
+  <button onclick="startRecording()">Start Recording</button>
+  <button onclick="stopRecording()">Stop Recording</button>
 
-      <div class="card">
-        <div class="row">
-          <strong>AI Tools</strong>
-        </div>
-        <div class="row" style="margin-top: 8px;">
-          <button id="btn-summarize" disabled>Summarize transcript</button>
-        </div>
-        <div class="row" style="margin-top: 8px;">
-          <input id="question" placeholder="Ask a question about this lecture…" />
-          <button id="btn-ask" disabled>Ask</button>
-        </div>
-        <div style="margin-top: 10px;">
-          <strong>AI Output</strong>
-          <textarea id="aiout" class="mono" placeholder="Summaries and answers will appear here…" style="min-height:160px;"></textarea>
-        </div>
-      </div>
-    </div>
+  <h3>📂 Or Upload MP3</h3>
+  <input type="file" id="fileInput" accept="audio/mp3" onchange="uploadMP3(event)">
 
-    <div class="card tiny muted">
-      <div><strong>Models (downloaded to your browser on first use):</strong></div>
-      <ul>
-        <li>Speech-to-text: <span class="mono">Xenova/whisper-tiny.en</span> (English; small and fast)</li>
-        <li>Summarization: <span class="mono">Xenova/t5-small</span> via text2text-generation (“summarize:” prompt)</li>
-        <li>Q&A: <span class="mono">Xenova/distilbert-base-cased-distilled-squad</span> (extractive answers from transcript)</li>
-      </ul>
-      <div>Everything runs in your browser using WebAssembly/WebGPU. No keys, no servers.</div>
-    </div>
+  <h3>📄 Transcript</h3>
+  <textarea id="transcript" placeholder="Transcript will appear here..."></textarea>
+  <button onclick="summarize()">Summarize</button>
+
+  <h3>❓ Ask a Question</h3>
+  <input type="text" id="questionInput" placeholder="Ask a question about the lecture">
+  <button onclick="askQuestion()">Ask</button>
+
+  <div class="output">
+    <h3>📝 Output</h3>
+    <div id="outputText"></div>
   </div>
 
-  <!-- Transformers.js (client-side only) -->
   <script>
-const $ = (id) => document.getElementById(id);
+    let mediaRecorder, audioChunks = [];
+    const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models";
 
-// UI elements
-const status = $("status"), prog = $("prog");
-const btnRecord = $("btn-record"), btnStop = $("btn-stop"), btnClear = $("btn-clear");
-const btnTranscribe = $("btn-transcribe"), btnSummarize = $("btn-summarize"), btnAsk = $("btn-ask");
-const transcriptEl = $("transcript"), aiOut = $("aiout"), player = $("player");
-const fileInput = $("file-input"), micNote = $("mic-note"), langBadge = $("lang-badge"), question = $("question");
+    // Load API key from localStorage
+    document.getElementById("apiKeyInput").value = localStorage.getItem("gemini_api_key") || "";
 
-let mediaRecorder, chunks = [];
-let audioBlob = null;
+    function saveApiKey() {
+      const key = document.getElementById("apiKeyInput").value.trim();
+      if (key) {
+        localStorage.setItem("gemini_api_key", key);
+        alert("API Key saved!");
+      }
+    }
 
-// --- API Key handling ---
-function getApiKey() {
-  return localStorage.getItem("openai_api_key");
-}
-async function ensureApiKey() {
-  let key = getApiKey();
-  if (!key) {
-    key = prompt("Enter your OpenAI API key (saved locally in this browser):");
-    if (key) localStorage.setItem("openai_api_key", key.trim());
-  }
-  return key;
-}
-function clearApiKey() {
-  localStorage.removeItem("openai_api_key");
-  alert("API key cleared from localStorage.");
-}
+    function getApiKey() {
+      return localStorage.getItem("gemini_api_key");
+    }
 
-// --- Utility ---
-function setStatus(msg, pct = null) {
-  status.textContent = msg;
-  if (pct === null) prog.removeAttribute("value");
-  else prog.value = pct;
-}
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.start();
+    }
 
-// --- Recording ---
-btnRecord.addEventListener("click", async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    chunks = [];
-    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-    mediaRecorder.onstop = () => {
-      audioBlob = new Blob(chunks, { type: "audio/webm" });
-      player.src = URL.createObjectURL(audioBlob);
-      btnTranscribe.disabled = false;
-      btnClear.disabled = false;
-      setStatus(`Recorded ${Math.round(audioBlob.size / 1024)} KB.`, 0);
-    };
-    mediaRecorder.start();
-    btnRecord.disabled = true;
-    btnStop.disabled = false;
-    btnClear.disabled = true;
-    micNote.textContent = "recording…";
-    setStatus("Recording…");
-  } catch (err) {
-    console.error(err);
-    setStatus("Microphone unavailable.", 0);
-    micNote.textContent = "error";
-  }
-});
+    function stopRecording() {
+      mediaRecorder.stop();
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        await transcribe(blob);
+      };
+    }
 
-btnStop.addEventListener("click", () => {
-  mediaRecorder?.stop();
-  mediaRecorder?.stream.getTracks().forEach(t => t.stop());
-  btnRecord.disabled = false;
-  btnStop.disabled = true;
-  micNote.textContent = "stopped";
-});
+    async function uploadMP3(event) {
+      const file = event.target.files[0];
+      if (file) {
+        await transcribe(file);
+      }
+    }
 
-btnClear.addEventListener("click", () => {
-  audioBlob = null;
-  player.removeAttribute("src");
-  transcriptEl.value = "";
-  aiOut.value = "";
-  btnTranscribe.disabled = true;
-  btnSummarize.disabled = true;
-  btnAsk.disabled = true;
-  langBadge.textContent = "—";
-  setStatus("Cleared.", 0);
-});
+    async function transcribe(fileOrBlob) {
+      const apiKey = getApiKey();
+      if (!apiKey) return alert("Please enter and save your Gemini API key first!");
 
-// --- File Upload ---
-fileInput.addEventListener("change", () => {
-  if (fileInput.files?.[0]) {
-    audioBlob = fileInput.files[0];
-    player.src = URL.createObjectURL(audioBlob);
-    btnTranscribe.disabled = false;
-    btnClear.disabled = false;
-    setStatus(`Loaded file: ${audioBlob.name} (${Math.round(audioBlob.size/1024)} KB).`, 0);
-  }
-});
+      const formData = new FormData();
+      formData.append("file", fileOrBlob);
 
-// --- API Calls ---
-async function transcribeAudio(blob) {
-  const key = await ensureApiKey();
-  if (!key) return "No API key provided.";
-  setStatus("Uploading audio for transcription…");
-  const formData = new FormData();
-  formData.append("file", blob, "lecture.webm");
-  formData.append("model", "whisper-1");
-  const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}` },
-    body: formData
-  });
-  const data = await resp.json();
-  return data.text;
-}
+      // Gemini does not have direct Whisper-like transcription yet → you’d route through another service (e.g. OpenAI Whisper API or AssemblyAI)
+      // Here we stub: Convert audio → base64 and send to Gemini multimodal endpoint (experimental)
+      const arrayBuffer = await fileOrBlob.arrayBuffer();
+      const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
 
-async function summarizeText(text) {
-  const key = await ensureApiKey();
-  if (!key) return "No API key provided.";
-  setStatus("Summarizing via API…");
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${key}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "You are a helpful assistant that summarizes lectures." },
-        { role: "user", content: "Summarize this lecture:\n\n" + text }
-      ]
-    })
-  });
-  const data = await resp.json();
-  return data.choices[0].message.content;
-}
+      const resp = await fetch(`${apiUrl}/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: "Transcribe the following lecture audio into text." },
+              { inline_data: { mime_type: "audio/mp3", data: base64Audio } }
+            ]
+          }]
+        })
+      });
 
-async function askQuestion(text, q) {
-  const key = await ensureApiKey();
-  if (!key) return "No API key provided.";
-  setStatus("Asking question via API…");
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${key}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "You are a helpful assistant for Q&A." },
-        { role: "user", content: `Lecture transcript:\n${text}\n\nQuestion: ${q}` }
-      ]
-    })
-  });
-  const data = await resp.json();
-  return data.choices[0].message.content;
-}
+      const data = await resp.json();
+      document.getElementById("transcript").value = data.candidates?.[0]?.content?.parts?.[0]?.text || "Transcription failed.";
+    }
 
-// --- Button Handlers ---
-btnTranscribe.addEventListener("click", async () => {
-  if (!audioBlob) return;
-  const text = await transcribeAudio(audioBlob);
-  transcriptEl.value = text;
-  langBadge.textContent = "en";
-  setStatus("Transcription complete ✔︎", 100);
-  btnSummarize.disabled = !text.trim();
-  btnAsk.disabled = !text.trim();
-});
+    async function summarize() {
+      const apiKey = getApiKey();
+      if (!apiKey) return alert("Please enter and save your Gemini API key first!");
 
-btnSummarize.addEventListener("click", async () => {
-  const txt = transcriptEl.value.trim();
-  if (!txt) return;
-  aiOut.value = await summarizeText(txt);
-  setStatus("Summary ready ✔︎", 100);
-});
+      const transcript = document.getElementById("transcript").value;
+      if (!transcript) return alert("No transcript to summarize!");
 
-btnAsk.addEventListener("click", async () => {
-  const txt = transcriptEl.value.trim();
-  const q = question.value.trim();
-  if (!txt || !q) return;
-  aiOut.value = await askQuestion(txt, q);
-  setStatus("Answer ready ✔︎", 100);
-});
+      const resp = await fetch(`${apiUrl}/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Summarize this lecture:\n\n" + transcript }] }]
+        })
+      });
 
-// allow manual key reset via console
-window.clearApiKey = clearApiKey;
-</script>
+      const data = await resp.json();
+      document.getElementById("outputText").innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Summarization failed.";
+    }
+
+    async function askQuestion() {
+      const apiKey = getApiKey();
+      if (!apiKey) return alert("Please enter and save your Gemini API key first!");
+
+      const transcript = document.getElementById("transcript").value;
+      const question = document.getElementById("questionInput").value;
+      if (!transcript || !question) return alert("Need both transcript and question!");
+
+      const resp = await fetch(`${apiUrl}/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `Lecture transcript:\n${transcript}\n\nQuestion: ${question}` }] }]
+        })
+      });
+
+      const data = await resp.json();
+      document.getElementById("outputText").innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Answer failed.";
+    }
+  </script>
 </body>
 </html>
