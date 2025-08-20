@@ -24,26 +24,26 @@ input[type="file"], input[type="text"], input[type="password"] { width: 100%; pa
 
 <label>Gemini API Key:</label>
 <input type="password" id="apiKeyInput" placeholder="Enter and save once">
-<button onclick="saveApiKey()">Save Key</button>
+<button id="key">Save Key</button>
 
 <h2>Record Audio</h2>
-<button id="recordBtn">🎙️ Start Recording</button>
-<button id="stopBtn" disabled>⏹️ Stop Recording</button>
+<button id="start" id="recordBtn">🎙️ Start Recording</button>
+<button id="stop" id="stopBtn" disabled>⏹️ Stop Recording</button>
 
 <h2>Upload MP3</h2>
 <input type="file" id="fileInput" accept="audio/mp3">
 
 <h2>Transcription</h2>
-<button onclick="transcribeAudio()">Transcribe Audio</button>
+<button id="transcribe">Transcribe Audio</button>
 <textarea id="transcription" placeholder="Transcription will appear here..."></textarea>
 
 <h2>AI Actions</h2>
 <input type="text" id="question" placeholder="Ask a question about the lecture">
-<button onclick="askAI()">Ask Question</button>
-<button onclick="summarizeLecture()">Summarize Lecture</button>
+<button id="ask" >Ask Question</button>
+<button id="summary" >Summarize Lecture</button>
 <textarea id="aiOutput" placeholder="AI output will appear here..."></textarea>
 
-<button onclick="downloadNotes()">Download Notes</button>
+<button id="download">Download Notes</button>
 
 <script type="module">
      import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -113,6 +113,8 @@ async function transcribeAudio() {
     };
     reader.readAsDataURL(audioBlob);
 }
+document.querySelector("#transcribe").onclick = transcribeAudio();
+document.querySelector("#key").onclick = saveApiKey();
 
 // Gemini AI helper
 async function geminiPrompt(prompt) {
@@ -146,6 +148,9 @@ async function summarizeLecture() {
     const summary = await geminiPrompt(prompt);
     document.getElementById("aiOutput").value = summary;
 }
+document.querySelector("#ask").onclick = askAI();
+document.querySelector("#summary").onclick = summarizeLecture();
+document.querySelector("#download").onclick = downloadNotes();
 
 // Download notes
 function downloadNotes() {
